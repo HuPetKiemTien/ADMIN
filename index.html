@@ -17,12 +17,18 @@
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Hiệu ứng gradient text */
-        .text-gradient { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #34d399, #3b82f6); }
-
         .nav-item.active { color: #3b82f6; }
         .nav-item.active i { transform: translateY(-3px); color: #3b82f6; }
         .nav-item { transition: all 0.2s; color: #64748b; }
+        
+        /* Loading overlay khi đang xử lý */
+        .card-processing { opacity: 0.5; pointer-events: none; position: relative; }
+        .card-processing::after {
+            content: "\f1ce"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            animation: spin 1s linear infinite; font-size: 24px; color: white;
+        }
+        @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden bg-slate-950">
@@ -50,48 +56,30 @@
             
             <!-- VIEW: DASHBOARD -->
             <div id="view-dashboard" class="space-y-5 fade-in">
-                
-                <!-- THỐNG KÊ TÀI CHÍNH (MỚI) -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">Dòng Tiền Hệ Thống</h3>
-                    
                     <div class="space-y-4">
-                        <!-- Tổng Nạp -->
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                                <div>
-                                    <p class="text-xs text-slate-400">Tổng Nạp (Giftcode)</p>
-                                    <p class="font-bold text-white text-lg" id="money-in">0</p>
-                                </div>
+                                <div><p class="text-xs text-slate-400">Tổng Nạp (Giftcode)</p><p class="font-bold text-white text-lg" id="money-in">0</p></div>
                             </div>
                         </div>
-
-                        <!-- Tổng Rút -->
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500"><i class="fa-solid fa-arrow-trend-down"></i></div>
-                                <div>
-                                    <p class="text-xs text-slate-400">Tổng Rút (Đã duyệt)</p>
-                                    <p class="font-bold text-white text-lg" id="money-out">0</p>
-                                </div>
+                                <div><p class="text-xs text-slate-400">Tổng Rút (Đã duyệt)</p><p class="font-bold text-white text-lg" id="money-out">0</p></div>
                             </div>
                         </div>
-
-                        <!-- Tổng Dư User -->
                         <div class="flex items-center justify-between pt-2 border-t border-slate-800/50">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500"><i class="fa-solid fa-wallet"></i></div>
-                                <div>
-                                    <p class="text-xs text-slate-400">Tổng Số Dư User</p>
-                                    <p class="font-bold text-blue-400 text-lg" id="money-holding">0</p>
-                                </div>
+                                <div><p class="text-xs text-slate-400">Tổng Số Dư User</p><p class="font-bold text-blue-400 text-lg" id="money-holding">0</p></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Thống kê Số lượng -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Đơn Chờ Duyệt</p>
@@ -108,9 +96,7 @@
             <div id="view-codes" class="hidden space-y-5 fade-in">
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg sticky top-0 z-30">
                     <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
-                            <i class="fa-solid fa-ticket text-sm"></i>
-                        </div>
+                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-ticket text-sm"></i></div>
                         <h3 class="font-bold text-white text-sm">Tạo Giftcode Mới</h3>
                     </div>
                     <div class="grid grid-cols-12 gap-3">
@@ -127,9 +113,7 @@
                         <i class="fa-solid fa-plus"></i> TẠO NGAY
                     </button>
                 </div>
-                <div class="space-y-3" id="list-codes">
-                    <div class="text-center text-slate-500 text-xs italic py-10">Đang tải danh sách...</div>
-                </div>
+                <div class="space-y-3" id="list-codes"></div>
             </div>
 
             <!-- VIEW: WITHDRAW -->
@@ -196,6 +180,9 @@
         const ADMIN_PASS = "admin123";
         const { createClient } = supabase;
         const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // --- GLOBAL LOCK VARIABLE ---
+        let isProcessing = false; // Khoá toàn cục để chống spam click
 
         // --- AUTH ---
         window.handleLogin = () => {
@@ -227,48 +214,35 @@
             input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        // --- STATS LOGIC (CẬP NHẬT TÍNH TIỀN) ---
+        // --- STATS LOGIC ---
         async function loadStats() {
             try {
-                // 1. Số lượng đơn chờ
                 const { count: pendingCount } = await db.from("withdraw_request").select("*", { count: 'exact', head: true }).eq("status", "pending");
                 const { count: userCount } = await db.from("users").select("*", { count: 'exact', head: true });
-                
-                // 2. Tính Tổng Tiền
-                // Tổng số dư User
                 const { data: users } = await db.from("users").select("balance");
                 const totalBalance = users ? users.reduce((sum, u) => sum + (u.balance || 0), 0) : 0;
-
-                // Tổng Nạp (Tính theo code đã dùng)
                 const { data: codes } = await db.from("codes_deposit").select("value, used_count");
                 const totalIn = codes ? codes.reduce((sum, c) => sum + (c.value * c.used_count), 0) : 0;
-
-                // Tổng Rút (Chỉ tính đơn đã Approved)
                 const { data: withdraws } = await db.from("withdraw_request").select("amount").eq("status", "approved");
                 const totalOut = withdraws ? withdraws.reduce((sum, w) => sum + (w.amount || 0), 0) : 0;
 
-                // Update UI
                 document.getElementById("stat-pending").innerText = pendingCount || 0;
                 document.getElementById("stat-users").innerText = userCount || 0;
-                
                 document.getElementById("money-in").innerText = totalIn.toLocaleString() + ' đ';
                 document.getElementById("money-out").innerText = totalOut.toLocaleString() + ' đ';
                 document.getElementById("money-holding").innerText = totalBalance.toLocaleString() + ' đ';
 
                 const badge = document.getElementById("badge-withdraw");
                 if (pendingCount > 0) badge.classList.remove("hidden"); else badge.classList.add("hidden");
-
             } catch(e) { console.error("Stats Error:", e); }
         }
 
-        // --- LOAD CODES ---
+        // --- CODES LOGIC ---
         window.loadCodes = async () => {
             const list = document.getElementById("list-codes");
             const { data, error } = await db.from("codes_deposit").select("*").order("id", {ascending: false});
             
-            if (error) { console.error(error); list.innerHTML = `<div class="text-center text-slate-500 text-xs italic">Chưa có mã nào</div>`; return; }
-            if (!data || !data.length) { list.innerHTML = `<div class="text-center text-slate-500 text-xs italic pt-4">Chưa có mã nào</div>`; return; }
-
+            if (error || !data || !data.length) { list.innerHTML = `<div class="text-center text-slate-500 text-xs italic py-10">Chưa có mã nào</div>`; return; }
             list.innerHTML = "";
             data.forEach(c => renderCodeItem(c, list));
         };
@@ -282,30 +256,17 @@
             const html = `
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex justify-between items-center ${isExpired ? 'opacity-60' : ''} ${highlightClass}">
                     <div class="flex-1">
-                        <div class="flex items-center">
-                            <span class="text-white font-mono font-bold text-lg tracking-wider select-all">${c.code}</span>
-                            ${newBadge}
-                        </div>
-                        <div class="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                            <i class="fa-solid fa-circle text-[6px] ${statusColor}"></i>
-                            <span class="text-emerald-400 font-bold">${c.value.toLocaleString()}</span> coin • ${c.used_count}/${c.max_use}
-                        </div>
+                        <div class="flex items-center"><span class="text-white font-mono font-bold text-lg tracking-wider select-all">${c.code}</span>${newBadge}</div>
+                        <div class="text-xs text-slate-400 mt-1 flex items-center gap-2"><i class="fa-solid fa-circle text-[6px] ${statusColor}"></i><span class="text-emerald-400 font-bold">${c.value.toLocaleString()}</span> coin • ${c.used_count}/${c.max_use}</div>
                     </div>
-                    <button onclick="deleteCode('${c.code}', this)" class="w-10 h-10 rounded-full bg-slate-950 text-slate-500 hover:text-rose-500 flex items-center justify-center transition-colors active:scale-90">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <button onclick="deleteCode('${c.code}', this)" class="w-10 h-10 rounded-full bg-slate-950 text-slate-500 hover:text-rose-500 flex items-center justify-center transition-colors active:scale-90"><i class="fa-solid fa-trash"></i></button>
                 </div>`;
-            
-            if(isNew) container.insertAdjacentHTML('afterbegin', html);
-            else container.insertAdjacentHTML('beforeend', html);
+            if(isNew) container.insertAdjacentHTML('afterbegin', html); else container.insertAdjacentHTML('beforeend', html);
         }
 
         window.createDepositCode = async () => {
-            const valInput = document.getElementById("code-amount");
-            const maxInput = document.getElementById("code-max");
-            const val = parseInt(valInput.value.replace(/,/g, ''));
-            const max = parseInt(maxInput.value);
-
+            const val = parseInt(document.getElementById("code-amount").value.replace(/,/g, ''));
+            const max = parseInt(document.getElementById("code-max").value);
             if (!val) return showToast("Nhập giá trị!", "error");
 
             const code = Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -314,11 +275,11 @@
             if (error) { showToast("Lỗi tạo mã", "error"); } 
             else {
                 showToast(`Đã tạo: ${code}`);
+                document.getElementById("code-amount").value = "";
                 const list = document.getElementById("list-codes");
                 if(list.innerText.includes("Chưa có mã")) list.innerHTML = "";
                 renderCodeItem({ code, value: val, max_use: max, used_count: 0, expired: false }, list, true);
-                valInput.value = "";
-                loadStats(); // Update tiền nạp
+                loadStats();
             }
         };
 
@@ -331,18 +292,17 @@
             if(error) { showToast("Lỗi xóa DB", "error"); loadCodes(); } else { showToast("Đã xóa"); loadStats(); }
         };
 
-        // --- WITHDRAWS ---
+        // --- WITHDRAWS (MỚI: AN TOÀN & CHỐNG SPAM) ---
         window.loadWithdraws = async () => {
             const list = document.getElementById("list-withdraws");
             const { data } = await db.from("withdraw_request").select("*").eq("status", "pending").order("time_request", {ascending: false});
             document.getElementById("withdraw-count").innerText = (data?.length || 0) + " đơn";
-
             if (!data || !data.length) { list.innerHTML = `<div class="text-center text-slate-500 text-xs italic py-12">Không có yêu cầu nào</div>`; return; }
 
             list.innerHTML = "";
             data.forEach(w => {
                 list.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm" id="wd-${w.id}">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm transition-all duration-300" id="wd-${w.id}">
                         <div class="flex justify-between items-start mb-3">
                             <div><h3 class="text-2xl font-bold text-white">${w.amount.toLocaleString()} <span class="text-sm font-normal text-slate-500">vnđ</span></h3><p class="text-[10px] text-slate-500 font-mono mt-0.5">${new Date(w.time_request).toLocaleString()}</p></div>
                             <span class="bg-blue-500/10 text-blue-500 px-2 py-1 rounded text-[10px] font-bold font-mono tracking-wide border border-blue-500/20">${w.uid}</span>
@@ -360,57 +320,94 @@
             });
         };
 
+        // 1. AN TOÀN TUYỆT ĐỐI CHO APPROVE
         window.handleApprove = async (id) => {
-            if(!confirm("Xác nhận duyệt?")) return;
-            document.getElementById(`wd-${id}`).remove();
-            const { error } = await db.from("withdraw_request").update({ status: "approved", time_done: new Date().toISOString() }).eq("id", id);
-            if(error) showToast("Lỗi hệ thống", "error"); else { showToast("Đã duyệt thành công"); loadStats(); }
-        };
+            if (isProcessing) return; // Nếu đang xử lý thì chặn click
+            if (!confirm("Xác nhận duyệt?")) return;
 
-        // --- NEW UPDATE: ROBUST HANDLE REJECT ---
-        window.handleReject = async (id, uid, amount) => {
-            if (!confirm("Từ chối và hoàn tiền?")) return;
-
+            isProcessing = true; // Bắt đầu khoá
             const card = document.getElementById(`wd-${id}`);
-            if (card) card.style.opacity = "0.6"; // UX: Làm mờ để báo đang xử lý
+            if (card) card.classList.add("card-processing"); // Hiệu ứng xoay loading
 
             try {
-                // 1) Lấy số dư user hiện tại để đảm bảo tính toán đúng
+                // Update DB trước
+                const { error } = await db
+                    .from("withdraw_request")
+                    .update({ status: "approved", time_done: new Date().toISOString() })
+                    .eq("id", id);
+
+                if (error) throw error; // Nếu lỗi DB/RLS -> nhảy xuống catch
+
+                // Thành công mới xóa UI
+                if (card) {
+                    card.style.transform = "translateX(100px)"; // Hiệu ứng lướt sang phải
+                    card.style.opacity = "0";
+                    setTimeout(() => card.remove(), 300);
+                }
+                showToast("Đã duyệt thành công");
+                loadStats();
+            } catch (e) {
+                console.error(e);
+                if (card) card.classList.remove("card-processing"); // Bỏ loading để ấn lại
+                showToast("Duyệt thất bại (Lỗi DB/RLS)", "error");
+            } finally {
+                // Mở khoá sau 2s để tránh spam
+                setTimeout(() => { isProcessing = false; }, 2000);
+            }
+        };
+
+        // 2. AN TOÀN TUYỆT ĐỐI CHO REJECT (HOÀN TIỀN)
+        window.handleReject = async (id, uid, amount) => {
+            if (isProcessing) return; // Chặn spam click
+            if (!confirm("Từ chối và hoàn tiền?")) return;
+
+            isProcessing = true; // Bắt đầu khoá
+            const card = document.getElementById(`wd-${id}`);
+            if (card) card.classList.add("card-processing"); // Hiệu ứng xoay loading
+
+            try {
+                // B1: Lấy số dư hiện tại (Tránh cộng dồn sai)
                 const { data: u, error: e1 } = await db.from("users").select("balance").eq("id", uid).single();
                 if (e1 || !u) throw new Error("Không tìm thấy User hoặc lỗi mạng.");
 
-                // 2) Cộng lại tiền (Hoàn tiền)
+                // B2: Hoàn tiền vào ví
                 const { error: e2 } = await db.from("users").update({ balance: (u.balance || 0) + Number(amount) }).eq("id", uid);
-                if (e2) throw new Error("Không hoàn được tiền (Lỗi DB).");
+                if (e2) throw new Error("Lỗi hoàn tiền (DB Error/RLS).");
 
-                // 3) Đổi trạng thái đơn sang rejected
+                // B3: Đổi trạng thái đơn
                 const { error: e3 } = await db
-                .from("withdraw_request")
-                .update({ status: "rejected", time_done: new Date().toISOString() })
-                .eq("id", id);
+                    .from("withdraw_request")
+                    .update({ status: "rejected", time_done: new Date().toISOString() })
+                    .eq("id", id);
 
-                if (e3) throw new Error("Tiền đã hoàn nhưng không cập nhật được trạng thái đơn.");
+                if (e3) throw new Error("Tiền đã hoàn nhưng không update được đơn.");
 
-                // OK: Xóa UI và thông báo
-                if (card) card.remove();
+                // Thành công mới xóa UI
+                if (card) {
+                    card.style.transform = "translateX(-100px)"; // Hiệu ứng lướt sang trái
+                    card.style.opacity = "0";
+                    setTimeout(() => card.remove(), 300);
+                }
                 showToast("Đã từ chối & hoàn tiền");
                 loadStats();
             } catch (err) {
                 console.error(err);
-                if (card) card.style.opacity = "1"; // Khôi phục UI nếu lỗi
+                if (card) card.classList.remove("card-processing"); // Bỏ loading để ấn lại
                 showToast(err.message || "Từ chối thất bại", "error");
+            } finally {
+                // Mở khoá sau 3s (lâu hơn xíu vì reject quan trọng)
+                setTimeout(() => { isProcessing = false; }, 3000);
             }
         };
         
-        // --- USERS (Nạp/Trừ) ---
+        // --- USERS ---
         window.adjustBalance = async (type) => {
             const uid = document.getElementById("adjust-uid").value.trim().toUpperCase();
             const amountInput = document.getElementById("adjust-amount");
             const amount = parseInt(amountInput.value.replace(/,/g, ''));
-
             if (!uid || isNaN(amount) || amount <= 0) return showToast("Nhập thông tin hợp lệ", "error");
 
-            const { data: user, error: errGet } = await db.from("users").select("*").eq("id", uid).maybeSingle();
+            const { data: user } = await db.from("users").select("*").eq("id", uid).maybeSingle();
             
             if (!user) {
                 if (type === 'subtract') return showToast("User không tồn tại", "error");
@@ -427,10 +424,8 @@
             }
 
             const { error: errUp } = await db.from("users").update({ balance: newBalance }).eq("id", uid);
-            
             if (errUp) { showToast("Lỗi cập nhật", "error"); } else {
-                const action = type === 'add' ? 'Nạp' : 'Trừ';
-                showToast(`${action} thành công. Dư: ${newBalance.toLocaleString()}`);
+                showToast(`${type === 'add' ? 'Nạp' : 'Trừ'} thành công. Dư: ${newBalance.toLocaleString()}`);
                 amountInput.value = "";
                 loadStats();
             }
@@ -440,11 +435,7 @@
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             const icon = document.getElementById('toast-icon');
-            if(type === 'error') {
-                icon.className = "fa-solid fa-triangle-exclamation text-rose-500";
-            } else {
-                icon.className = "fa-solid fa-check text-emerald-500";
-            }
+            icon.className = type === 'error' ? "fa-solid fa-triangle-exclamation text-rose-500" : "fa-solid fa-check text-emerald-500";
             t.classList.remove('opacity-0', '-translate-y-20');
             setTimeout(() => t.classList.add('opacity-0', '-translate-y-20'), 3000);
         }
