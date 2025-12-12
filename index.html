@@ -367,15 +367,39 @@
             if(error) showToast("Lỗi hệ thống", "error"); else { showToast("Đã duyệt thành công"); loadStats(); }
         };
 
+        // --- NEW UPDATE: ROBUST HANDLE REJECT ---
         window.handleReject = async (id, uid, amount) => {
-            if(!confirm("Từ chối và hoàn tiền?")) return;
-            document.getElementById(`wd-${id}`).remove();
-            const { data: u } = await db.from("users").select("balance").eq("id", uid).single();
-            if(u) {
-                await db.from("users").update({ balance: u.balance + amount }).eq("id", uid);
-                await db.from("withdraw_request").update({ status: "rejected", time_done: new Date().toISOString() }).eq("id", id);
-                showToast("Đã hoàn tiền"); loadStats();
-            } else showToast("Lỗi user", "error");
+            if (!confirm("Từ chối và hoàn tiền?")) return;
+
+            const card = document.getElementById(`wd-${id}`);
+            if (card) card.style.opacity = "0.6"; // UX: Làm mờ để báo đang xử lý
+
+            try {
+                // 1) Lấy số dư user hiện tại để đảm bảo tính toán đúng
+                const { data: u, error: e1 } = await db.from("users").select("balance").eq("id", uid).single();
+                if (e1 || !u) throw new Error("Không tìm thấy User hoặc lỗi mạng.");
+
+                // 2) Cộng lại tiền (Hoàn tiền)
+                const { error: e2 } = await db.from("users").update({ balance: (u.balance || 0) + Number(amount) }).eq("id", uid);
+                if (e2) throw new Error("Không hoàn được tiền (Lỗi DB).");
+
+                // 3) Đổi trạng thái đơn sang rejected
+                const { error: e3 } = await db
+                .from("withdraw_request")
+                .update({ status: "rejected", time_done: new Date().toISOString() })
+                .eq("id", id);
+
+                if (e3) throw new Error("Tiền đã hoàn nhưng không cập nhật được trạng thái đơn.");
+
+                // OK: Xóa UI và thông báo
+                if (card) card.remove();
+                showToast("Đã từ chối & hoàn tiền");
+                loadStats();
+            } catch (err) {
+                console.error(err);
+                if (card) card.style.opacity = "1"; // Khôi phục UI nếu lỗi
+                showToast(err.message || "Từ chối thất bại", "error");
+            }
         };
         
         // --- USERS (Nạp/Trừ) ---
