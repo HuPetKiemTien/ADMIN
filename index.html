@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CoinAdmin V7 - Financial Stats</title>
+    <title>CoinAdmin V7 - Secure Logic</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -301,6 +301,7 @@
 
             list.innerHTML = "";
             data.forEach(w => {
+                // SỬA HTML: Nút từ chối chỉ truyền ID
                 list.innerHTML += `
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm transition-all duration-300" id="wd-${w.id}">
                         <div class="flex justify-between items-start mb-3">
@@ -313,7 +314,7 @@
                             <div class="flex justify-between items-center text-xs"><span class="text-slate-500">Số TK</span><span class="text-white font-mono font-bold tracking-wide select-all">${w.bank_account}</span></div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <button onclick="handleReject('${w.id}', '${w.uid}', ${w.amount}')" class="py-3 rounded-xl font-bold text-xs text-rose-500 bg-rose-950/30 border border-rose-900/50 hover:bg-rose-900/50 transition-colors">TỪ CHỐI</button>
+                            <button onclick="handleReject('${w.id}')" class="py-3 rounded-xl font-bold text-xs text-rose-500 bg-rose-950/30 border border-rose-900/50 hover:bg-rose-900/50 transition-colors">TỪ CHỐI</button>
                             <button onclick="handleApprove('${w.id}')" class="py-3 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-900/20 transition-colors">DUYỆT ĐƠN</button>
                         </div>
                     </div>`;
@@ -356,23 +357,47 @@
             }
         };
 
-        // 2. AN TOÀN TUYỆT ĐỐI CHO REJECT (HOÀN TIỀN)
-        window.handleReject = async (id, uid, amount) => {
-            if (isProcessing) return; // Chặn spam click
+        // 2. AN TOÀN TUYỆT ĐỐI CHO REJECT (HOÀN TIỀN) - LOGIC MỚI
+        window.handleReject = async (id) => {
+            if (isProcessing) return;              // Chặn spam click
             if (!confirm("Từ chối và hoàn tiền?")) return;
 
-            isProcessing = true; // Bắt đầu khoá
+            isProcessing = true;                   // Bắt đầu khoá
             const card = document.getElementById(`wd-${id}`);
             if (card) card.classList.add("card-processing"); // Hiệu ứng xoay loading
 
             try {
-                // B1: Lấy số dư hiện tại (Tránh cộng dồn sai)
-                const { data: u, error: e1 } = await db.from("users").select("balance").eq("id", uid).single();
-                if (e1 || !u) throw new Error("Không tìm thấy User hoặc lỗi mạng.");
+                // B0: Lấy lại thông tin đơn để chắc chắn (tránh truyền sai uid/amount)
+                const { data: w, error: e0 } = await db
+                    .from("withdraw_request")
+                    .select("uid, amount, status")
+                    .eq("id", id)
+                    .single();
+
+                if (e0 || !w) throw new Error("Không tìm thấy đơn rút.");
+                if (w.status !== "pending") throw new Error("Đơn này đã được xử lý trước đó.");
+
+                const uid = w.uid;
+                const amount = Number(w.amount || 0);
+
+                // B1: Lấy số dư hiện tại
+                const { data: u, error: e1 } = await db
+                    .from("users")
+                    .select("balance")
+                    .eq("id", uid)
+                    .single();
+
+                if (e1 || !u) throw new Error("Không tìm thấy user hoặc lỗi mạng.");
+
+                const newBalance = (u.balance || 0) + amount;
 
                 // B2: Hoàn tiền vào ví
-                const { error: e2 } = await db.from("users").update({ balance: (u.balance || 0) + Number(amount) }).eq("id", uid);
-                if (e2) throw new Error("Lỗi hoàn tiền (DB Error/RLS).");
+                const { error: e2 } = await db
+                    .from("users")
+                    .update({ balance: newBalance })
+                    .eq("id", uid);
+
+                if (e2) throw new Error("Lỗi hoàn tiền (DB/RLS).");
 
                 // B3: Đổi trạng thái đơn
                 const { error: e3 } = await db
@@ -388,14 +413,15 @@
                     card.style.opacity = "0";
                     setTimeout(() => card.remove(), 300);
                 }
-                showToast("Đã từ chối & hoàn tiền");
+
+                showToast(`Đã hoàn tiền. Dư mới: ${newBalance.toLocaleString()}`);
                 loadStats();
             } catch (err) {
                 console.error(err);
                 if (card) card.classList.remove("card-processing"); // Bỏ loading để ấn lại
                 showToast(err.message || "Từ chối thất bại", "error");
             } finally {
-                // Mở khoá sau 3s (lâu hơn xíu vì reject quan trọng)
+                // Mở khoá sau 3s (reject quan trọng, khoá lâu hơn chút)
                 setTimeout(() => { isProcessing = false; }, 3000);
             }
         };
