@@ -15,25 +15,17 @@
                         bg: '#0B0E14',
                         surface: '#151A23',
                         primary: '#3B82F6',
-                        accent: '#8B5CF6',
-                        success: '#10B981',
-                        danger: '#EF4444',
                     },
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
                         slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
                             '100%': { transform: 'translateY(0)', opacity: '1' },
                         }
                     }
@@ -42,252 +34,190 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
         body { background-color: #0B0E14; color: #E2E8F0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        /* Glassmorphism Utilities */
-        .glass { background: rgba(21, 26, 35, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-high { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
+        .glass { background: rgba(21, 26, 35, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Custom Inputs */
-        .input-dark { background: #0f131a; border: 1px solid #2d3748; transition: all 0.3s; }
-        .input-dark:focus { border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        /* Fix login layout on mobile */
+        .h-dvh { height: 100dvh; } 
         
-        /* Navigation Active State */
-        .nav-item { position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .nav-item.active { color: #60A5FA; transform: translateY(-4px); }
-        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: #60A5FA; border-radius: 50%; box-shadow: 0 0 8px #60A5FA; }
-
         /* Loader */
-        .spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1); border-left-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-left-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden relative selection:bg-primary/30">
+<body class="h-dvh flex flex-col overflow-hidden relative selection:bg-blue-500/30">
 
-    <!-- BACKGROUND BLOBS -->
-    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-violet-600/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
-
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-[#0B0E14]">
-        <div class="relative w-full max-w-sm glass-high p-8 rounded-3xl shadow-2xl border border-white/5 animate-slide-up">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-gradient-to-br from-blue-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 animate-float">
-                <i class="fa-solid fa-shield-halved text-3xl text-white"></i>
-            </div>
-            <div class="mt-8 text-center">
-                <h2 class="text-2xl font-bold text-white">Admin Portal</h2>
-                <p class="text-slate-400 text-sm mt-1">Hệ thống quản trị tập trung</p>
+    <!-- LOGIN SCREEN (FIXED CENTER) -->
+    <div id="login-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B0E14] px-6 h-dvh w-screen">
+        <!-- Background Effects -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px] pointer-events-none"></div>
+        
+        <div class="relative w-full max-w-[320px] space-y-8 animate-slide-up">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-900/40 mb-4">
+                    <i class="fa-solid fa-shield-cat text-2xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Admin Portal</h2>
             </div>
             
-            <div class="mt-8 space-y-4">
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="password" id="admin-pass" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-blue-500 transition-colors placeholder-slate-600" placeholder="Mật khẩu truy cập">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    <span>TRUY CẬP</span>
-                    <i class="fa-solid fa-arrow-right"></i>
+            <div class="space-y-3">
+                <input type="password" id="admin-pass" class="w-full bg-[#151A23] border border-slate-700 text-white rounded-xl px-4 py-4 text-center text-lg focus:outline-none focus:border-blue-500 focus:bg-[#1A202C] transition-all placeholder-slate-600" placeholder="Nhập mã bảo mật">
+                
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span>ĐĂNG NHẬP</span>
                 </button>
             </div>
         </div>
-        <p class="absolute bottom-8 text-slate-600 text-xs font-mono">v7.0.2 Secure Build</p>
+        <p class="absolute bottom-6 text-slate-700 text-[10px] font-mono">SECURE SYSTEM V7.1</p>
     </div>
 
     <!-- MAIN APP -->
     <div id="main-app" class="hidden flex-1 flex flex-col h-full relative z-10 max-w-md mx-auto w-full bg-[#0B0E14] shadow-2xl">
+        
         <!-- HEADER -->
-        <header class="h-16 flex items-center justify-between px-6 glass sticky top-0 z-40">
-            <div>
-                <h1 id="page-title" class="font-bold text-lg text-white tracking-tight">Tổng quan</h1>
-                <div class="flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span class="text-[10px] text-emerald-500 font-bold uppercase tracking-wider">Live System</span>
-                </div>
+        <header class="h-14 flex items-center justify-between px-5 glass sticky top-0 z-40 shrink-0">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <h1 id="page-title" class="font-bold text-sm text-white tracking-wide uppercase">Tổng quan</h1>
             </div>
-            <button onclick="loadAllData()" id="btn-refresh" class="w-10 h-10 rounded-xl bg-slate-800/50 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-all active:scale-90 border border-white/5">
+            <button onclick="loadAllData()" id="btn-refresh" class="w-8 h-8 rounded-lg bg-slate-800/50 text-slate-400 flex items-center justify-center active:scale-90 border border-white/5">
                 <i class="fa-solid fa-rotate"></i>
             </button>
         </header>
 
         <!-- CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto no-scrollbar pt-6 pb-28 px-5 space-y-8">
+        <main class="flex-1 overflow-hidden relative flex flex-col">
             
-            <!-- VIEW: DASHBOARD -->
-            <div id="view-dashboard" class="space-y-6 animate-slide-up">
-                <!-- Main Balance Card -->
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-violet-700 p-6 shadow-2xl shadow-blue-900/30">
-                    <div class="absolute top-0 right-0 p-4 opacity-20"><i class="fa-brands fa-bitcoin text-8xl transform rotate-12"></i></div>
-                    <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-1">Tổng Số Dư User</p>
+            <!-- VIEW: DASHBOARD (Cuộn bình thường) -->
+            <div id="view-dashboard" class="flex-1 overflow-y-auto no-scrollbar p-5 space-y-5 animate-slide-up">
+                <!-- Balance Card -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 to-indigo-800 p-6 shadow-xl">
+                    <div class="absolute -right-4 -top-4 text-white opacity-10 text-9xl"><i class="fa-brands fa-ethereum"></i></div>
+                    <p class="text-blue-200 text-[10px] font-bold uppercase tracking-widest mb-1">Số dư toàn hệ thống</p>
                     <h2 class="text-3xl font-bold text-white font-mono tracking-tight" id="money-holding">0</h2>
-                    <div class="mt-6 flex gap-4">
-                        <div class="flex-1 bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                            <div class="flex items-center gap-2 mb-1">
-                                <div class="w-5 h-5 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center text-[10px]"><i class="fa-solid fa-arrow-down"></i></div>
-                                <span class="text-[10px] text-blue-100">Tổng Nạp</span>
-                            </div>
+                    
+                    <div class="mt-6 grid grid-cols-2 gap-3 relative z-10">
+                        <div class="bg-black/20 rounded-xl p-3 backdrop-blur-sm border border-white/5">
+                            <p class="text-[10px] text-emerald-300 mb-1 flex items-center gap-1"><i class="fa-solid fa-arrow-down"></i> Đã Nạp</p>
                             <p class="text-sm font-bold text-white" id="money-in">0</p>
                         </div>
-                        <div class="flex-1 bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                            <div class="flex items-center gap-2 mb-1">
-                                <div class="w-5 h-5 rounded-full bg-rose-400/20 text-rose-300 flex items-center justify-center text-[10px]"><i class="fa-solid fa-arrow-up"></i></div>
-                                <span class="text-[10px] text-blue-100">Tổng Rút</span>
-                            </div>
+                        <div class="bg-black/20 rounded-xl p-3 backdrop-blur-sm border border-white/5">
+                            <p class="text-[10px] text-rose-300 mb-1 flex items-center gap-1"><i class="fa-solid fa-arrow-up"></i> Đã Rút</p>
                             <p class="text-sm font-bold text-white" id="money-out">0</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass p-5 rounded-2xl border-l-4 border-yellow-500">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#151A23] p-4 rounded-2xl border border-slate-800">
                         <div class="flex justify-between items-start mb-2">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Chờ Duyệt</p>
-                            <i class="fa-solid fa-clock text-yellow-500/50"></i>
+                            <span class="text-yellow-500 bg-yellow-500/10 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-clock"></i></span>
+                            <span class="text-[10px] text-slate-500 font-bold">CHỜ DUYỆT</span>
                         </div>
                         <h3 class="text-2xl font-bold text-white" id="stat-pending">--</h3>
                     </div>
-                    <div class="glass p-5 rounded-2xl border-l-4 border-blue-500">
+                    <div class="bg-[#151A23] p-4 rounded-2xl border border-slate-800">
                         <div class="flex justify-between items-start mb-2">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Tổng User</p>
-                            <i class="fa-solid fa-users text-blue-500/50"></i>
+                            <span class="text-blue-500 bg-blue-500/10 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-users"></i></span>
+                            <span class="text-[10px] text-slate-500 font-bold">TỔNG USER</span>
                         </div>
                         <h3 class="text-2xl font-bold text-white" id="stat-users">--</h3>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW: CODES -->
-            <div id="view-codes" class="hidden space-y-6 animate-slide-up">
-                <!-- Create Tool -->
-                <div class="glass p-5 rounded-3xl space-y-4 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                        <h3 class="font-bold text-white text-sm">Khởi tạo Giftcode</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="col-span-2 space-y-1">
-                            <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">Giá trị (Coin)</label>
-                            <input id="code-amount" type="tel" oninput="formatInput(this)" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3 text-sm font-bold focus:border-emerald-500 outline-none transition-colors" placeholder="50,000">
+            <!-- VIEW: CODES (Tối ưu bố cục: Tạo code cố định, Danh sách cuộn) -->
+            <div id="view-codes" class="hidden h-full flex flex-col animate-slide-up">
+                <!-- Fixed Control Panel -->
+                <div class="shrink-0 p-4 border-b border-slate-800 bg-[#0B0E14] z-20">
+                    <div class="bg-[#151A23] rounded-2xl p-3 border border-slate-700/50 shadow-lg">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-6 h-6 bg-emerald-500/10 text-emerald-500 rounded flex items-center justify-center text-xs"><i class="fa-solid fa-bolt"></i></div>
+                            <span class="text-xs font-bold text-slate-300">Tạo nhanh</span>
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">Lượt dùng</label>
-                            <input id="code-max" type="number" value="1" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-2 py-3 text-center text-sm font-bold focus:border-emerald-500 outline-none">
+                        <div class="flex gap-2">
+                            <input id="code-amount" type="tel" oninput="formatInput(this)" class="flex-1 bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-3 py-2.5 text-sm font-bold focus:border-emerald-500 outline-none placeholder-slate-600" placeholder="Giá trị (50,000)">
+                            <input id="code-max" type="number" value="1" class="w-16 bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-1 py-2.5 text-center text-sm font-bold focus:border-emerald-500 outline-none">
+                            <button onclick="createDepositCode()" class="w-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95 transition-all">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
                         </div>
                     </div>
-                    <button onclick="createDepositCode()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Tạo Mã Ngay
-                    </button>
                 </div>
 
-                <!-- List -->
-                <div>
-                    <div class="flex items-center justify-between px-2 mb-3">
-                        <h3 class="text-xs font-bold text-slate-500 uppercase">Danh sách mã hoạt động</h3>
-                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded-md" id="code-count-display">0</span>
-                    </div>
-                    <div class="space-y-3" id="list-codes"></div>
+                <!-- Scrollable List -->
+                <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 pb-24" id="list-codes">
+                    <!-- Codes will be injected here -->
                 </div>
             </div>
 
             <!-- VIEW: WITHDRAW -->
-            <div id="view-withdraw" class="hidden space-y-5 animate-slide-up">
+            <div id="view-withdraw" class="hidden flex-1 overflow-y-auto no-scrollbar p-4 space-y-4 pb-24 animate-slide-up">
                 <div class="flex items-center justify-between px-1">
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Yêu cầu chờ xử lý</p>
-                    <span class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded" id="withdraw-count">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Danh sách yêu cầu</span>
+                    <span class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded" id="withdraw-count">0</span>
                 </div>
                 <div class="space-y-4" id="list-withdraws"></div>
             </div>
 
             <!-- VIEW: USERS -->
-            <div id="view-users" class="hidden space-y-6 animate-slide-up">
-                <div class="glass p-6 rounded-3xl text-center space-y-6 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+            <div id="view-users" class="hidden flex-1 overflow-y-auto no-scrollbar p-5 pb-24 animate-slide-up">
+                <div class="bg-[#151A23] p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full pointer-events-none"></div>
                     
-                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.1)]">
-                        <i class="fa-solid fa-user-astronaut"></i>
-                    </div>
-                    
-                    <div>
-                        <h3 class="text-white font-bold text-xl">Điều chỉnh số dư</h3>
-                        <p class="text-slate-500 text-xs mt-1">Nạp hoặc trừ tiền thủ công</p>
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-indigo-500/20">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <h3 class="text-white font-bold text-lg">Biến động số dư</h3>
                     </div>
 
-                    <div class="space-y-4 text-left">
+                    <div class="space-y-4">
                         <div class="space-y-1">
                             <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">ID Người dùng</label>
-                            <div class="relative group">
-                                <span class="absolute left-4 top-3.5 text-slate-500 group-focus-within:text-indigo-500 transition-colors"><i class="fa-solid fa-fingerprint"></i></span>
-                                <input id="adjust-uid" type="text" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl pl-10 pr-4 py-3.5 focus:border-indigo-500 outline-none font-mono uppercase tracking-widest placeholder-slate-700 transition-all" placeholder="USER-ID">
-                            </div>
+                            <input id="adjust-uid" type="text" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-indigo-500 outline-none font-mono text-sm placeholder-slate-700 transition-all uppercase" placeholder="NHAP-USER-ID">
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">Số tiền</label>
-                            <div class="relative group">
-                                <input id="adjust-amount" type="tel" oninput="formatInput(this)" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3.5 focus:border-indigo-500 outline-none font-bold text-lg font-mono placeholder-slate-700 text-center transition-all" placeholder="0">
-                            </div>
+                            <input id="adjust-amount" type="tel" oninput="formatInput(this)" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-indigo-500 outline-none font-bold font-mono text-lg placeholder-slate-700 transition-all" placeholder="0">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <button onclick="adjustBalance('subtract')" class="relative overflow-hidden flex flex-col items-center justify-center py-4 rounded-2xl bg-slate-800/50 border border-rose-500/30 text-rose-500 hover:bg-rose-950/30 active:scale-[0.98] transition-all group">
-                            <span class="text-[10px] font-bold uppercase mb-1 opacity-70">Thu hồi</span>
-                            <i class="fa-solid fa-minus text-xl font-bold"></i>
-                        </button>
-                        <button onclick="adjustBalance('add')" class="relative overflow-hidden flex flex-col items-center justify-center py-4 rounded-2xl bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-900/30 hover:from-indigo-500 hover:to-indigo-600 active:scale-[0.98] transition-all">
-                            <span class="text-[10px] font-bold uppercase mb-1 opacity-90">Cộng tiền</span>
-                            <i class="fa-solid fa-plus text-xl font-bold"></i>
-                        </button>
+                    <div class="grid grid-cols-2 gap-3 mt-6">
+                        <button onclick="adjustBalance('subtract')" class="py-3 rounded-xl bg-slate-800 text-rose-400 font-bold text-xs hover:bg-slate-700 transition-colors border border-slate-700">TRỪ TIỀN</button>
+                        <button onclick="adjustBalance('add')" class="py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 shadow-lg shadow-indigo-900/30 transition-colors">CỘNG TIỀN</button>
                     </div>
                 </div>
             </div>
         </main>
 
         <!-- NAV BAR -->
-        <nav class="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[360px] h-[70px] glass-high rounded-full flex justify-between items-center px-6 shadow-2xl z-50 border border-white/10">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 w-12 h-12">
-                <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
+        <nav class="absolute bottom-6 left-6 right-6 h-[64px] glass rounded-2xl flex justify-between items-center px-6 shadow-2xl z-50 border border-white/10">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10">
+                <i class="fa-solid fa-chart-simple text-lg"></i>
             </button>
-            <button onclick="switchTab('codes')" id="nav-codes" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 w-12 h-12">
-                <i class="fa-solid fa-ticket text-xl mb-1"></i>
+            <button onclick="switchTab('codes')" id="nav-codes" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10">
+                <i class="fa-solid fa-qrcode text-lg"></i>
             </button>
-            <button onclick="switchTab('withdraw')" id="nav-withdraw" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 w-12 h-12 relative">
-                <i class="fa-solid fa-money-bill-transfer text-xl mb-1"></i>
-                <span id="badge-withdraw" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[#1E293B]"></span>
+            <button onclick="switchTab('withdraw')" id="nav-withdraw" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10 relative">
+                <i class="fa-solid fa-money-bills text-lg"></i>
+                <span id="badge-withdraw" class="hidden absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-full"></span>
             </button>
-            <button onclick="switchTab('users')" id="nav-users" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 w-12 h-12">
-                <i class="fa-solid fa-users-gear text-xl mb-1"></i>
+            <button onclick="switchTab('users')" id="nav-users" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10">
+                <i class="fa-solid fa-user-pen text-lg"></i>
             </button>
         </nav>
     </div>
 
-    <!-- CUSTOM CONFIRM MODAL -->
-    <div id="modal-confirm" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-[#151A23] border border-slate-700 w-full max-w-xs rounded-3xl p-6 transform scale-95 transition-transform duration-300" id="modal-box">
-            <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl mb-4 text-blue-500 mx-auto">
-                <i class="fa-solid fa-question"></i>
-            </div>
-            <h3 class="text-white font-bold text-center text-lg mb-2" id="modal-title">Xác nhận</h3>
-            <p class="text-slate-400 text-center text-sm mb-6 leading-relaxed" id="modal-msg">Bạn có chắc chắn muốn thực hiện?</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="modal-btn-cancel" class="py-3 rounded-xl bg-slate-800 text-slate-300 font-bold text-sm hover:bg-slate-700 transition-colors">Hủy</button>
-                <button id="modal-btn-ok" class="py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/30">Đồng ý</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 w-auto max-w-[90%] glass-high border border-slate-700 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-20 z-[70] backdrop-blur-xl">
-        <div id="toast-icon-bg" class="w-8 h-8 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-500">
-            <i id="toast-icon" class="fa-solid fa-check text-sm"></i>
-        </div>
-        <span class="text-sm font-semibold tracking-wide" id="toast-msg">Notification</span>
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 w-max max-w-[90%] bg-[#1A202C] border border-slate-700 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-10 z-[100] pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-check text-emerald-500"></i>
+        <span class="text-xs font-bold" id="toast-msg">Thông báo</span>
     </div>
 
     <script>
@@ -300,261 +230,208 @@
         
         let isProcessing = false;
 
-        // --- AUTH ---
-        window.handleLogin = () => {
-            const pass = document.getElementById("admin-pass").value;
-            if (pass === ADMIN_PASS) {
-                const screen = document.getElementById("login-screen");
-                screen.style.opacity = '0';
-                setTimeout(() => {
-                    screen.classList.add("hidden");
-                    document.getElementById("main-app").classList.remove("hidden");
-                    loadAllData();
-                }, 300);
-            } else {
-                showToast("Mật khẩu không đúng", "error");
-                document.getElementById("admin-pass").classList.add("border-rose-500");
-                setTimeout(() => document.getElementById("admin-pass").classList.remove("border-rose-500"), 1000);
-            }
-        };
-
-        // --- CORE NAVIGATION ---
-        window.loadAllData = async () => { 
-            const btn = document.getElementById("btn-refresh");
-            btn.querySelector("i").classList.add("fa-spin");
-            await Promise.all([loadStats(), loadCodes(), loadWithdraws()]); 
-            setTimeout(() => btn.querySelector("i").classList.remove("fa-spin"), 500);
-        };
-
-        window.switchTab = (tab) => {
-            // UI Transition
-            const views = ['dashboard', 'codes', 'withdraw', 'users'];
-            views.forEach(t => {
-                const el = document.getElementById(`view-${t}`);
-                if (t === tab) {
-                    el.classList.remove('hidden');
-                    // Reset animation
-                    el.classList.remove('animate-slide-up');
-                    void el.offsetWidth; // Trigger reflow
-                    el.classList.add('animate-slide-up');
-                    document.getElementById(`nav-${t}`).classList.add('active');
-                } else {
-                    el.classList.add('hidden');
-                    document.getElementById(`nav-${t}`).classList.remove('active');
-                }
-            });
-
-            // Update Title
-            const titles = {
-                dashboard: "Tổng Quan Hệ Thống",
-                codes: "Quản Lý Mã Thưởng",
-                withdraw: "Duyệt Đơn Rút",
-                users: "Giao Dịch Thủ Công"
-            };
-            document.getElementById("page-title").innerText = titles[tab];
-            
-            // Lazy Load
-            if(tab === 'withdraw') loadWithdraws();
-            if(tab === 'codes' && document.getElementById("list-codes").children.length <= 1) loadCodes();
-            if(tab === 'dashboard') loadStats();
+        // --- UI UTILS ---
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            const icon = document.getElementById('toast-icon');
+            icon.className = type === 'error' ? "fa-solid fa-triangle-exclamation text-rose-500" : "fa-solid fa-circle-check text-emerald-500";
+            t.classList.remove('opacity-0', '-translate-y-10');
+            setTimeout(() => t.classList.add('opacity-0', '-translate-y-10'), 2500);
         }
 
-        // --- FORMATTER ---
         window.formatInput = (input) => {
             let val = input.value.replace(/\D/g, '');
             input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        // --- STATS LOGIC ---
+        // --- AUTH ---
+        window.handleLogin = () => {
+            const input = document.getElementById("admin-pass");
+            if (input.value === ADMIN_PASS) {
+                const screen = document.getElementById("login-screen");
+                screen.style.transition = "opacity 0.4s ease";
+                screen.style.opacity = "0";
+                setTimeout(() => {
+                    screen.classList.add("hidden");
+                    document.getElementById("main-app").classList.remove("hidden");
+                    loadAllData();
+                }, 400);
+            } else {
+                showToast("Mật khẩu không đúng", "error");
+                input.value = "";
+                input.focus();
+            }
+        };
+
+        window.loadAllData = async () => { 
+            const btn = document.getElementById("btn-refresh");
+            btn.querySelector('i').classList.add('fa-spin');
+            await Promise.all([loadStats(), loadCodes(), loadWithdraws()]); 
+            setTimeout(() => btn.querySelector('i').classList.remove('fa-spin'), 500);
+        };
+
+        window.switchTab = (tab) => {
+            ['dashboard', 'codes', 'withdraw', 'users'].forEach(t => {
+                const el = document.getElementById(`view-${t}`);
+                if (t === tab) {
+                    el.classList.remove('hidden');
+                    if (t === 'codes') el.classList.add('flex'); // Special display for codes layout
+                    document.getElementById(`nav-${t}`).classList.add('text-blue-400');
+                    document.getElementById(`nav-${t}`).classList.remove('text-slate-500');
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                    document.getElementById(`nav-${t}`).classList.remove('text-blue-400');
+                    document.getElementById(`nav-${t}`).classList.add('text-slate-500');
+                }
+            });
+
+            const titles = {dashboard: "Tổng Quan", codes: "Kho Giftcode", withdraw: "Duyệt Đơn", users: "Người Dùng"};
+            document.getElementById("page-title").innerText = titles[tab].toUpperCase();
+            
+            if(tab === 'withdraw') loadWithdraws();
+            if(tab === 'codes' && document.getElementById("list-codes").children.length === 0) loadCodes();
+            if(tab === 'dashboard') loadStats();
+        }
+
+        // --- LOGIC ---
         async function loadStats() {
             try {
-                // Parallel fetching for speed
-                const [
-                    { count: pendingCount },
-                    { count: userCount },
-                    { data: users },
-                    { data: codes },
-                    { data: withdraws }
-                ] = await Promise.all([
+                const [pending, users, codes, withdraws] = await Promise.all([
                     db.from("withdraw_request").select("*", { count: 'exact', head: true }).eq("status", "pending"),
-                    db.from("users").select("*", { count: 'exact', head: true }),
                     db.from("users").select("balance"),
                     db.from("codes_deposit").select("value, used_count"),
                     db.from("withdraw_request").select("amount").eq("status", "approved")
                 ]);
 
-                const totalBalance = users ? users.reduce((sum, u) => sum + (u.balance || 0), 0) : 0;
-                const totalIn = codes ? codes.reduce((sum, c) => sum + (c.value * c.used_count), 0) : 0;
-                const totalOut = withdraws ? withdraws.reduce((sum, w) => sum + (w.amount || 0), 0) : 0;
+                const totalBalance = users.data ? users.data.reduce((sum, u) => sum + (u.balance || 0), 0) : 0;
+                const totalIn = codes.data ? codes.data.reduce((sum, c) => sum + (c.value * c.used_count), 0) : 0;
+                const totalOut = withdraws.data ? withdraws.data.reduce((sum, w) => sum + (w.amount || 0), 0) : 0;
 
-                animateValue("stat-pending", parseInt(document.getElementById("stat-pending").innerText) || 0, pendingCount || 0, 1000);
-                animateValue("stat-users", parseInt(document.getElementById("stat-users").innerText) || 0, userCount || 0, 1000);
-                
+                document.getElementById("stat-pending").innerText = pending.count || 0;
+                document.getElementById("stat-users").innerText = users.data?.length || 0;
                 document.getElementById("money-in").innerText = totalIn.toLocaleString();
                 document.getElementById("money-out").innerText = totalOut.toLocaleString();
                 document.getElementById("money-holding").innerText = totalBalance.toLocaleString();
 
                 const badge = document.getElementById("badge-withdraw");
-                if (pendingCount > 0) {
-                    badge.classList.remove("hidden");
-                    badge.classList.add("animate-pulse");
-                } else {
-                    badge.classList.add("hidden");
-                }
-            } catch(e) { console.error("Stats Error:", e); }
+                if ((pending.count || 0) > 0) badge.classList.remove("hidden"); else badge.classList.add("hidden");
+            } catch(e) { console.error(e); }
         }
 
-        // Counter Animation Effect
-        function animateValue(id, start, end, duration) {
-            if (start === end) return;
-            const obj = document.getElementById(id);
-            const range = end - start;
-            let current = start;
-            const increment = end > start ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / range));
-            
-            const timer = setInterval(function() {
-                current += increment;
-                obj.innerHTML = current;
-                if (current == end) clearInterval(timer);
-            }, Math.max(stepTime, 50)); // Min 50ms to prevent lag
-            obj.innerHTML = end; // Fallback instant update
-        }
-
-        // --- CODES LOGIC ---
         window.loadCodes = async () => {
             const list = document.getElementById("list-codes");
-            list.innerHTML = `<div class="flex justify-center py-8"><div class="spinner"></div></div>`; // Skeleton loader
+            list.innerHTML = '<div class="flex justify-center py-4"><div class="spinner"></div></div>';
             
             const { data, error } = await db.from("codes_deposit").select("*").order("id", {ascending: false});
             
             if (error || !data || !data.length) { 
-                list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 opacity-50"><i class="fa-solid fa-ticket text-4xl mb-3 text-slate-600"></i><p class="text-xs text-slate-400">Chưa có mã giftcode nào</p></div>`;
-                document.getElementById("code-count-display").innerText = "0";
+                list.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Danh sách trống</div>`; 
                 return; 
             }
-            
-            document.getElementById("code-count-display").innerText = data.length;
             list.innerHTML = "";
             data.forEach(c => renderCodeItem(c, list));
         };
 
         function renderCodeItem(c, container, isNew = false) {
             const isExpired = c.expired || c.used_count >= c.max_use;
-            const opacity = isExpired ? 'opacity-50 grayscale' : '';
-            const newBadge = isNew ? `<span class="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-2 font-bold animate-pulse shadow-emerald-500/50 shadow-lg">MỚI</span>` : '';
-            
             const html = `
-                <div class="glass p-4 rounded-2xl flex justify-between items-center group relative overflow-hidden transition-all duration-300 ${opacity}">
-                    ${isNew ? '<div class="absolute inset-0 bg-emerald-500/10 animate-pulse"></div>' : ''}
-                    <div class="relative z-10">
-                        <div class="flex items-center">
-                            <i class="fa-solid fa-ticket text-slate-600 mr-2 text-xs"></i>
-                            <span class="text-white font-mono font-bold text-lg tracking-wider select-all cursor-pointer hover:text-blue-400" onclick="copyToClip('${c.code}')">${c.code}</span>
-                            ${newBadge}
+                <div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 flex justify-between items-center ${isExpired ? 'opacity-50' : ''} ${isNew ? 'animate-slide-up bg-slate-800' : ''}">
+                    <div class="flex-1 overflow-hidden">
+                        <div class="flex items-center gap-2">
+                            <span class="text-white font-mono font-bold text-base tracking-wider truncate">${c.code}</span>
+                            ${isNew ? '<span class="bg-emerald-500 text-[9px] px-1 rounded text-white font-bold">MỚI</span>' : ''}
                         </div>
-                        <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-3">
-                            <span class="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 rounded">${c.value.toLocaleString()}</span>
-                            <span><i class="fa-solid fa-users text-[10px] mr-1"></i>${c.used_count}/${c.max_use}</span>
+                        <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-2">
+                            <span class="text-emerald-400 font-bold">${c.value.toLocaleString()}</span>
+                            <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+                            <span>${c.used_count}/${c.max_use} lượt</span>
                         </div>
                     </div>
-                    <button onclick="deleteCode('${c.code}', this)" class="relative z-10 w-9 h-9 rounded-xl bg-slate-800/50 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 flex items-center justify-center transition-all active:scale-90">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    <button onclick="deleteCode('${c.code}', this)" class="w-8 h-8 rounded-lg bg-slate-900 text-slate-600 hover:text-rose-500 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>`;
-            
-            if(isNew) {
-                container.insertAdjacentHTML('afterbegin', html);
-            } else {
-                container.insertAdjacentHTML('beforeend', html);
-            }
+            if(isNew) container.insertAdjacentHTML('afterbegin', html); else container.insertAdjacentHTML('beforeend', html);
         }
 
         window.createDepositCode = async () => {
+            const btn = document.querySelector('button[onclick="createDepositCode()"]');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="width:12px;height:12px;"></div>';
+            btn.disabled = true;
+
             const val = parseInt(document.getElementById("code-amount").value.replace(/,/g, ''));
             const max = parseInt(document.getElementById("code-max").value);
-            if (!val) return showToast("Vui lòng nhập giá trị coin", "error");
+
+            if (!val) {
+                showToast("Nhập giá trị!", "error");
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+                return;
+            }
 
             const code = Math.random().toString(36).substr(2, 6).toUpperCase();
-            
-            // Optimistic UI update
-            const btn = document.querySelector("button[onclick='createDepositCode()']");
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<div class="spinner border-emerald-200"></div>`;
-            
             const { error } = await db.from("codes_deposit").insert({ code, value: val, max_use: max, used_count: 0, expired: false });
 
-            if (error) { showToast("Lỗi hệ thống", "error"); } 
+            if (error) { showToast("Lỗi!", "error"); } 
             else {
-                showToast(`Đã tạo: ${code}`);
+                showToast("Đã tạo code");
                 document.getElementById("code-amount").value = "";
                 const list = document.getElementById("list-codes");
-                if(list.innerText.includes("Chưa có mã")) list.innerHTML = "";
+                if(list.innerText.includes("trống")) list.innerHTML = "";
                 renderCodeItem({ code, value: val, max_use: max, used_count: 0, expired: false }, list, true);
                 loadStats();
             }
-            btn.innerHTML = originalText;
+            btn.innerHTML = originalIcon;
+            btn.disabled = false;
         };
 
-        window.deleteCode = async (code, btnElement) => {
-            showModal("Xóa Giftcode", "Bạn có chắc chắn muốn xóa mã này vĩnh viễn?", async () => {
-                const card = btnElement.closest('div.glass');
-                card.style.transform = 'translateX(100%)';
-                card.style.opacity = '0';
-                
-                const { error } = await db.from("codes_deposit").delete().eq("code", code);
-                if(error) { 
-                    showToast("Lỗi xóa DB", "error"); 
-                    card.style.transform = 'none';
-                    card.style.opacity = '1';
-                } else { 
-                    showToast("Đã xóa mã"); 
-                    setTimeout(() => card.remove(), 300);
-                    loadStats(); 
-                }
-            });
+        window.deleteCode = async (code, btn) => {
+            if(!confirm("Xóa mã này?")) return;
+            const card = btn.closest('div');
+            card.style.opacity = '0';
+            const { error } = await db.from("codes_deposit").delete().eq("code", code);
+            if(!error) { 
+                setTimeout(() => card.remove(), 300); 
+                loadStats();
+            } else {
+                card.style.opacity = '1';
+                showToast("Lỗi xóa", "error");
+            }
         };
 
-        // --- WITHDRAWS LOGIC ---
         window.loadWithdraws = async () => {
             const list = document.getElementById("list-withdraws");
-            // Skeleton
-            if(list.children.length === 0) list.innerHTML = `<div class="space-y-3">${Array(3).fill('<div class="h-32 bg-slate-800/50 rounded-2xl animate-pulse"></div>').join('')}</div>`;
-
             const { data } = await db.from("withdraw_request").select("*").eq("status", "pending").order("time_request", {ascending: false});
-            
             document.getElementById("withdraw-count").innerText = (data?.length || 0);
             
             if (!data || !data.length) { 
-                list.innerHTML = `<div class="flex flex-col items-center justify-center py-12 opacity-50"><i class="fa-solid fa-clipboard-check text-5xl mb-3 text-slate-700"></i><p class="text-sm text-slate-500 font-medium">Không có yêu cầu nào</p></div>`; 
+                list.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không có yêu cầu nào</div>`; 
                 return; 
             }
 
             list.innerHTML = "";
             data.forEach(w => {
                 list.innerHTML += `
-                    <div class="glass p-5 rounded-3xl relative overflow-hidden group transition-all" id="wd-${w.id}">
+                    <div class="bg-[#151A23] border border-slate-800 rounded-xl p-4 relative overflow-hidden group" id="wd-${w.id}">
                         <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                        <div class="flex justify-between items-start mb-4 pl-2">
+                        <div class="flex justify-between items-start mb-3">
                             <div>
-                                <h3 class="text-2xl font-bold text-white tracking-tight">${w.amount.toLocaleString()} <span class="text-sm font-medium text-slate-500">VNĐ</span></h3>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <i class="fa-regular fa-clock text-[10px] text-slate-500"></i>
-                                    <p class="text-[10px] text-slate-400 font-mono">${new Date(w.time_request).toLocaleString()}</p>
-                                </div>
+                                <h3 class="text-xl font-bold text-white tracking-tight">${w.amount.toLocaleString()}</h3>
+                                <p class="text-[10px] text-slate-500 font-mono">${new Date(w.time_request).toLocaleString()}</p>
                             </div>
-                            <span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-[10px] font-bold font-mono tracking-wide border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.2)]">${w.uid}</span>
+                            <span class="text-[10px] font-bold font-mono text-blue-400 bg-blue-500/10 px-2 py-1 rounded">${w.uid}</span>
                         </div>
-                        
-                        <div class="bg-[#0B0E14] rounded-xl p-3.5 mb-5 space-y-2.5 border border-slate-800 text-sm">
-                            <div class="flex justify-between items-center"><span class="text-slate-500 text-xs">Ngân hàng</span><span class="text-white font-bold">${w.bank_name}</span></div>
-                            <div class="flex justify-between items-center"><span class="text-slate-500 text-xs">Chủ TK</span><span class="text-white font-bold uppercase">${w.holder_name}</span></div>
-                            <div class="flex justify-between items-center"><span class="text-slate-500 text-xs">Số TK</span><span class="text-white font-mono font-bold tracking-wide select-all cursor-copy text-blue-300" onclick="copyToClip('${w.bank_account}')">${w.bank_account} <i class="fa-regular fa-copy ml-1 text-xs opacity-50"></i></span></div>
+                        <div class="bg-[#0B0E14] rounded-lg p-3 space-y-2 mb-3 border border-white/5">
+                            <div class="flex justify-between text-xs"><span class="text-slate-500">Bank</span><span class="text-white font-bold">${w.bank_name}</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-slate-500">Tên</span><span class="text-white font-bold uppercase">${w.holder_name}</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-slate-500">STK</span><span class="text-white font-mono font-bold select-all">${w.bank_account}</span></div>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-3 pl-2">
-                            <button onclick="handleReject('${w.id}')" class="py-3 rounded-xl font-bold text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 transition-colors">TỪ CHỐI</button>
-                            <button onclick="handleApprove('${w.id}')" class="py-3 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 shadow-lg shadow-emerald-900/20 transition-all">DUYỆT ĐƠN</button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="handleReject('${w.id}')" class="py-2.5 rounded-lg text-xs font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20">HỦY ĐƠN</button>
+                            <button onclick="handleApprove('${w.id}')" class="py-2.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-900/20">DUYỆT CHI</button>
                         </div>
                     </div>`;
             });
@@ -562,175 +439,82 @@
 
         window.handleApprove = async (id) => {
             if (isProcessing) return;
-            showModal("Duyệt Đơn Rút", "Xác nhận đã chuyển tiền cho người dùng này?", async () => {
-                isProcessing = true;
-                const card = document.getElementById(`wd-${id}`);
-                card.style.opacity = "0.5";
-                
-                try {
-                    const { error } = await db.from("withdraw_request").update({ status: "approved", time_done: new Date().toISOString() }).eq("id", id);
-                    if (error) throw error;
-                    
-                    card.style.transform = "translateY(-20px)";
-                    card.style.opacity = "0";
-                    setTimeout(() => { card.remove(); loadStats(); }, 300);
-                    showToast("Đã duyệt thành công");
-                } catch (e) {
-                    console.error(e);
-                    card.style.opacity = "1";
-                    showToast("Duyệt thất bại", "error");
-                } finally { isProcessing = false; }
-            });
+            if (!confirm("Duyệt đơn này?")) return;
+            isProcessing = true;
+            const card = document.getElementById(`wd-${id}`);
+            card.style.opacity = '0.5';
+            
+            const { error } = await db.from("withdraw_request").update({ status: "approved", time_done: new Date().toISOString() }).eq("id", id);
+            if (!error) {
+                card.remove();
+                showToast("Đã duyệt");
+                loadStats();
+            } else {
+                card.style.opacity = '1';
+                showToast("Lỗi", "error");
+            }
+            isProcessing = false;
         };
 
         window.handleReject = async (id) => {
             if (isProcessing) return;
-            showModal("Từ Chối & Hoàn Tiền", "Xác nhận hủy đơn và hoàn lại số dư cho user?", async () => {
-                isProcessing = true;
-                const card = document.getElementById(`wd-${id}`);
-                card.style.opacity = "0.5";
+            if (!confirm("Hoàn tiền và hủy đơn?")) return;
+            isProcessing = true;
+            const card = document.getElementById(`wd-${id}`);
+            card.style.opacity = '0.5';
 
-                try {
-                    const { data: w, error: e0 } = await db.from("withdraw_request").select("uid, amount, status").eq("id", id).single();
-                    if (e0 || !w || w.status !== "pending") throw new Error("Lỗi dữ liệu đơn.");
-                    
-                    const { data: u, error: e1 } = await db.from("users").select("balance").eq("id", w.uid).single();
-                    const newBalance = (u?.balance || 0) + Number(w.amount || 0);
-                    
-                    await Promise.all([
-                        db.from("users").update({ balance: newBalance }).eq("id", w.uid),
-                        db.from("withdraw_request").update({ status: "rejected", time_done: new Date().toISOString() }).eq("id", id)
-                    ]);
-
-                    card.style.transform = "scale(0.9)";
-                    card.style.opacity = "0";
-                    setTimeout(() => { card.remove(); loadStats(); }, 300);
-                    showToast(`Đã hoàn tiền user`);
-                } catch (err) {
-                    console.error(err);
-                    card.style.opacity = "1";
-                    showToast("Có lỗi xảy ra", "error");
-                } finally { isProcessing = false; }
-            });
+            try {
+                const { data: w } = await db.from("withdraw_request").select("uid, amount").eq("id", id).single();
+                const { data: u } = await db.from("users").select("balance").eq("id", w.uid).single();
+                
+                await db.from("users").update({ balance: (u.balance || 0) + (w.amount || 0) }).eq("id", w.uid);
+                await db.from("withdraw_request").update({ status: "rejected", time_done: new Date().toISOString() }).eq("id", id);
+                
+                card.remove();
+                showToast("Đã hoàn tiền");
+                loadStats();
+            } catch (e) {
+                card.style.opacity = '1';
+                showToast("Lỗi", "error");
+            }
+            isProcessing = false;
         };
-        
-        // --- USERS ADJUSTMENT ---
+
         window.adjustBalance = async (type) => {
             const uid = document.getElementById("adjust-uid").value.trim().toUpperCase();
-            const amountInput = document.getElementById("adjust-amount");
-            const amount = parseInt(amountInput.value.replace(/,/g, ''));
+            const raw = document.getElementById("adjust-amount").value.replace(/,/g, '');
+            const amount = parseInt(raw);
+            if (!uid || !amount) return showToast("Kiểm tra lại dữ liệu", "error");
 
-            if (!uid || isNaN(amount) || amount <= 0) return showToast("Dữ liệu không hợp lệ", "error");
+            if(!confirm(`Xác nhận ${type === 'add' ? 'NẠP' : 'TRỪ'} ${amount.toLocaleString()} cho ${uid}?`)) return;
 
-            showModal(type === 'add' ? "Nạp Tiền" : "Trừ Tiền", `Xác nhận ${type === 'add' ? 'CỘNG' : 'TRỪ'} ${amount.toLocaleString()} coin cho User: ${uid}?`, async () => {
-                const { data: user, error: errUser } = await db.from("users").select("balance").eq("id", uid).maybeSingle();
-
-                if (errUser) return showToast("Lỗi kết nối", "error");
-
-                if (!user) {
-                    if (type === "subtract") return showToast("User không tồn tại", "error");
-                    // Logic create new user handled implicitly here by insert
-                    const { error: errIns } = await db.from("users").insert({ id: uid, balance: amount });
-                    if (!errIns) {
-                         await db.from("deposit_history").insert({ uid: uid, amount: amount, source: "admin_add", note: "Admin tạo mới" });
-                         showToast(`Đã tạo User & Nạp ${amount.toLocaleString()}`);
-                         amountInput.value = "";
-                         loadStats();
-                         return;
-                    }
-                }
-
-                let newBalance = user.balance || 0;
-                let source = "";
-                let note = "";
-
-                if (type === "add") {
-                    newBalance += amount;
-                    source = "admin_add";
-                    note = "Admin cộng tiền";
-                } else {
-                    if (newBalance < amount) return showToast("Số dư không đủ", "error");
-                    newBalance -= amount;
-                    source = "admin_subtract";
-                    note = "Admin trừ tiền";
-                }
-
-                const { error: errUp } = await db.from("users").update({ balance: newBalance }).eq("id", uid);
-                
-                if (!errUp) {
-                    await db.from("deposit_history").insert({ uid: uid, amount: amount, source: source, note: note });
-                    showToast(`Thành công. Dư mới: ${newBalance.toLocaleString()}`);
-                    amountInput.value = "";
-                    loadStats();
-                } else {
-                    showToast("Cập nhật thất bại", "error");
-                }
-            });
-        };
-
-        // --- UTILS ---
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
+            const { data: user } = await db.from("users").select("balance").eq("id", uid).maybeSingle();
             
-            const iconBg = document.getElementById('toast-icon-bg');
-            const icon = document.getElementById('toast-icon');
+            if (!user && type === 'subtract') return showToast("User không tồn tại", "error");
             
-            if (type === 'error') {
-                iconBg.className = "w-8 h-8 rounded-full flex items-center justify-center bg-rose-500/20 text-rose-500";
-                icon.className = "fa-solid fa-xmark text-sm";
-                t.style.borderColor = "rgba(244, 63, 94, 0.3)";
+            let newBalance = user ? user.balance : 0;
+            if (type === 'add') newBalance += amount;
+            else {
+                if(newBalance < amount) return showToast("Không đủ số dư", "error");
+                newBalance -= amount;
+            }
+
+            if (!user && type === 'add') {
+                await db.from("users").insert({ id: uid, balance: newBalance });
+                await db.from("deposit_history").insert({ uid, amount, source: "admin_create", note: "Admin tạo mới" });
             } else {
-                iconBg.className = "w-8 h-8 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-500";
-                icon.className = "fa-solid fa-check text-sm";
-                t.style.borderColor = "rgba(16, 185, 129, 0.3)";
+                await db.from("users").update({ balance: newBalance }).eq("id", uid);
+                await db.from("deposit_history").insert({ 
+                    uid, amount, 
+                    source: type === 'add' ? "admin_add" : "admin_sub", 
+                    note: type === 'add' ? "Admin nạp" : "Admin trừ" 
+                });
             }
             
-            t.classList.remove('opacity-0', '-translate-y-20');
-            setTimeout(() => t.classList.add('opacity-0', '-translate-y-20'), 3000);
-        }
-
-        // Custom Modal Logic
-        function showModal(title, msg, onConfirm) {
-            const modal = document.getElementById('modal-confirm');
-            const box = document.getElementById('modal-box');
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-msg').innerText = msg;
-            
-            const btnOk = document.getElementById('modal-btn-ok');
-            const btnCancel = document.getElementById('modal-btn-cancel');
-            
-            // Clean old listeners
-            const newBtnOk = btnOk.cloneNode(true);
-            const newBtnCancel = btnCancel.cloneNode(true);
-            btnOk.parentNode.replaceChild(newBtnOk, btnOk);
-            btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
-
-            newBtnOk.onclick = () => { closeModal(); onConfirm(); };
-            newBtnCancel.onclick = closeModal;
-
-            modal.classList.remove('hidden');
-            // Allow display:block to apply then animate opacity
-            requestAnimationFrame(() => {
-                modal.classList.remove('opacity-0');
-                box.classList.remove('scale-95');
-                box.classList.add('scale-100');
-            });
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('modal-confirm');
-            const box = document.getElementById('modal-box');
-            modal.classList.add('opacity-0');
-            box.classList.remove('scale-100');
-            box.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        function copyToClip(text) {
-            navigator.clipboard.writeText(text);
-            showToast(`Đã copy: ${text}`);
-        }
+            showToast("Thành công");
+            document.getElementById("adjust-amount").value = "";
+            loadStats();
+        };
     </script>
 </body>
 </html>
