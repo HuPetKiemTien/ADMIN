@@ -40,22 +40,20 @@
         .glass { background: rgba(21, 26, 35, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Fix login layout on mobile */
         .h-dvh { height: 100dvh; } 
-        
-        /* Loader */
         .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-left-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        /* Tab transition */
+        .tab-btn { position: relative; }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background-color: #3B82F6; border-radius: 4px; }
     </style>
 </head>
 <body class="h-dvh flex flex-col overflow-hidden relative selection:bg-blue-500/30">
 
-    <!-- LOGIN SCREEN (FIXED CENTER) -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B0E14] px-6 h-dvh w-screen">
-        <!-- Background Effects -->
         <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px] pointer-events-none"></div>
-        
         <div class="relative w-full max-w-[320px] space-y-8 animate-slide-up">
             <div class="text-center">
                 <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-900/40 mb-4">
@@ -63,16 +61,14 @@
                 </div>
                 <h2 class="text-2xl font-bold text-white tracking-tight">Admin Portal</h2>
             </div>
-            
             <div class="space-y-3">
                 <input type="password" id="admin-pass" class="w-full bg-[#151A23] border border-slate-700 text-white rounded-xl px-4 py-4 text-center text-lg focus:outline-none focus:border-blue-500 focus:bg-[#1A202C] transition-all placeholder-slate-600" placeholder="Nhập mã bảo mật">
-                
                 <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                     <span>ĐĂNG NHẬP</span>
                 </button>
             </div>
         </div>
-        <p class="absolute bottom-6 text-slate-700 text-[10px] font-mono">SECURE SYSTEM V7.1</p>
+        <p class="absolute bottom-6 text-slate-700 text-[10px] font-mono">SECURE SYSTEM V7.3</p>
     </div>
 
     <!-- MAIN APP -->
@@ -92,9 +88,8 @@
         <!-- CONTENT AREA -->
         <main class="flex-1 overflow-hidden relative flex flex-col">
             
-            <!-- VIEW: DASHBOARD (Cuộn bình thường) -->
+            <!-- VIEW: DASHBOARD -->
             <div id="view-dashboard" class="flex-1 overflow-y-auto no-scrollbar p-5 space-y-5 animate-slide-up">
-                <!-- Balance Card -->
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 to-indigo-800 p-6 shadow-xl">
                     <div class="absolute -right-4 -top-4 text-white opacity-10 text-9xl"><i class="fa-brands fa-ethereum"></i></div>
                     <p class="text-blue-200 text-[10px] font-bold uppercase tracking-widest mb-1">Số dư toàn hệ thống</p>
@@ -102,26 +97,25 @@
                     
                     <div class="mt-6 grid grid-cols-2 gap-3 relative z-10">
                         <div class="bg-black/20 rounded-xl p-3 backdrop-blur-sm border border-white/5">
-                            <p class="text-[10px] text-emerald-300 mb-1 flex items-center gap-1"><i class="fa-solid fa-arrow-down"></i> Đã Nạp</p>
+                            <p class="text-[10px] text-emerald-300 mb-1 flex items-center gap-1"><i class="fa-solid fa-arrow-down"></i> Tổng Nạp</p>
                             <p class="text-sm font-bold text-white" id="money-in">0</p>
                         </div>
                         <div class="bg-black/20 rounded-xl p-3 backdrop-blur-sm border border-white/5">
-                            <p class="text-[10px] text-rose-300 mb-1 flex items-center gap-1"><i class="fa-solid fa-arrow-up"></i> Đã Rút</p>
+                            <p class="text-[10px] text-rose-300 mb-1 flex items-center gap-1"><i class="fa-solid fa-arrow-up"></i> Tổng Rút</p>
                             <p class="text-sm font-bold text-white" id="money-out">0</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Stats -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-[#151A23] p-4 rounded-2xl border border-slate-800">
+                    <div onclick="switchTab('withdraw')" class="bg-[#151A23] p-4 rounded-2xl border border-slate-800 active:scale-95 transition-transform cursor-pointer">
                         <div class="flex justify-between items-start mb-2">
                             <span class="text-yellow-500 bg-yellow-500/10 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-clock"></i></span>
                             <span class="text-[10px] text-slate-500 font-bold">CHỜ DUYỆT</span>
                         </div>
                         <h3 class="text-2xl font-bold text-white" id="stat-pending">--</h3>
                     </div>
-                    <div class="bg-[#151A23] p-4 rounded-2xl border border-slate-800">
+                    <div onclick="switchTab('users')" class="bg-[#151A23] p-4 rounded-2xl border border-slate-800 active:scale-95 transition-transform cursor-pointer">
                         <div class="flex justify-between items-start mb-2">
                             <span class="text-blue-500 bg-blue-500/10 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-users"></i></span>
                             <span class="text-[10px] text-slate-500 font-bold">TỔNG USER</span>
@@ -131,9 +125,8 @@
                 </div>
             </div>
 
-            <!-- VIEW: CODES (Tối ưu bố cục: Tạo code cố định, Danh sách cuộn) -->
+            <!-- VIEW: CODES -->
             <div id="view-codes" class="hidden h-full flex flex-col animate-slide-up">
-                <!-- Fixed Control Panel -->
                 <div class="shrink-0 p-4 border-b border-slate-800 bg-[#0B0E14] z-20">
                     <div class="bg-[#151A23] rounded-2xl p-3 border border-slate-700/50 shadow-lg">
                         <div class="flex items-center gap-2 mb-3">
@@ -149,17 +142,13 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Scrollable List -->
-                <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 pb-24" id="list-codes">
-                    <!-- Codes will be injected here -->
-                </div>
+                <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 pb-24" id="list-codes"></div>
             </div>
 
             <!-- VIEW: WITHDRAW -->
             <div id="view-withdraw" class="hidden flex-1 overflow-y-auto no-scrollbar p-4 space-y-4 pb-24 animate-slide-up">
                 <div class="flex items-center justify-between px-1">
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Danh sách yêu cầu</span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Yêu cầu chờ duyệt</span>
                     <span class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded" id="withdraw-count">0</span>
                 </div>
                 <div class="space-y-4" id="list-withdraws"></div>
@@ -169,14 +158,12 @@
             <div id="view-users" class="hidden flex-1 overflow-y-auto no-scrollbar p-5 pb-24 animate-slide-up">
                 <div class="bg-[#151A23] p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full pointer-events-none"></div>
-                    
                     <div class="flex flex-col items-center mb-6">
                         <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-indigo-500/20">
                             <i class="fa-solid fa-wallet"></i>
                         </div>
                         <h3 class="text-white font-bold text-lg">Biến động số dư</h3>
                     </div>
-
                     <div class="space-y-4">
                         <div class="space-y-1">
                             <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">ID Người dùng</label>
@@ -187,17 +174,51 @@
                             <input id="adjust-amount" type="tel" oninput="formatInput(this)" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-indigo-500 outline-none font-bold font-mono text-lg placeholder-slate-700 transition-all" placeholder="0">
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-3 mt-6">
                         <button onclick="adjustBalance('subtract')" class="py-3 rounded-xl bg-slate-800 text-rose-400 font-bold text-xs hover:bg-slate-700 transition-colors border border-slate-700">TRỪ TIỀN</button>
                         <button onclick="adjustBalance('add')" class="py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 shadow-lg shadow-indigo-900/30 transition-colors">CỘNG TIỀN</button>
                     </div>
                 </div>
             </div>
+
+            <!-- VIEW: HISTORY -->
+            <div id="view-history" class="hidden flex-1 flex flex-col h-full animate-slide-up">
+                <!-- Search & Tabs -->
+                <div class="shrink-0 bg-[#0B0E14] z-20 border-b border-slate-800">
+                    <!-- Search Bar -->
+                    <div class="px-4 pt-4 pb-2">
+                        <div class="relative">
+                            <input id="hist-search-input" onkeyup="if(event.key === 'Enter') loadHistory()" type="text" class="w-full bg-[#151A23] border border-slate-700 text-white text-xs rounded-xl pl-10 pr-4 py-3 focus:border-blue-500 outline-none transition-colors uppercase font-mono" placeholder="Tìm theo ID User...">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                            <button onclick="loadHistory()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg">TÌM</button>
+                        </div>
+                    </div>
+                    <!-- Tab Switchers -->
+                    <div class="flex items-center gap-6 px-4 pt-2">
+                        <button onclick="switchHistoryTab('tx')" id="htab-tx" class="tab-btn active pb-3 text-sm font-bold text-white transition-colors">Biến động</button>
+                        <button onclick="switchHistoryTab('wd')" id="htab-wd" class="tab-btn pb-3 text-sm font-bold text-slate-500 hover:text-white transition-colors">Lịch sử Rút</button>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 pb-24 relative">
+                    <div id="hist-list-tx" class="space-y-3">
+                        <!-- Transactions -->
+                    </div>
+                    <div id="hist-list-wd" class="hidden space-y-3">
+                        <!-- Withdrawals -->
+                    </div>
+                    <!-- Loader Overlay for History -->
+                    <div id="hist-loader" class="hidden absolute inset-0 flex items-center justify-center bg-[#0B0E14] z-30">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <!-- NAV BAR -->
-        <nav class="absolute bottom-6 left-6 right-6 h-[64px] glass rounded-2xl flex justify-between items-center px-6 shadow-2xl z-50 border border-white/10">
+        <nav class="absolute bottom-6 left-4 right-4 h-[64px] glass rounded-2xl flex justify-between items-center px-4 shadow-2xl z-50 border border-white/10">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10">
                 <i class="fa-solid fa-chart-simple text-lg"></i>
             </button>
@@ -210,6 +231,9 @@
             </button>
             <button onclick="switchTab('users')" id="nav-users" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10">
                 <i class="fa-solid fa-user-pen text-lg"></i>
+            </button>
+            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-white transition-colors w-10">
+                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
             </button>
         </nav>
     </div>
@@ -268,45 +292,75 @@
             const btn = document.getElementById("btn-refresh");
             btn.querySelector('i').classList.add('fa-spin');
             await Promise.all([loadStats(), loadCodes(), loadWithdraws()]); 
+            if (!document.getElementById("view-history").classList.contains("hidden")) loadHistory();
             setTimeout(() => btn.querySelector('i').classList.remove('fa-spin'), 500);
         };
 
         window.switchTab = (tab) => {
-            ['dashboard', 'codes', 'withdraw', 'users'].forEach(t => {
+            ['dashboard', 'codes', 'withdraw', 'users', 'history'].forEach(t => {
                 const el = document.getElementById(`view-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
                 if (t === tab) {
                     el.classList.remove('hidden');
-                    if (t === 'codes') el.classList.add('flex'); // Special display for codes layout
-                    document.getElementById(`nav-${t}`).classList.add('text-blue-400');
-                    document.getElementById(`nav-${t}`).classList.remove('text-slate-500');
+                    if (t === 'codes' || t === 'history') el.classList.add('flex');
+                    nav.classList.add('text-blue-400');
+                    nav.classList.remove('text-slate-500');
                 } else {
                     el.classList.add('hidden');
                     el.classList.remove('flex');
-                    document.getElementById(`nav-${t}`).classList.remove('text-blue-400');
-                    document.getElementById(`nav-${t}`).classList.add('text-slate-500');
+                    nav.classList.remove('text-blue-400');
+                    nav.classList.add('text-slate-500');
                 }
             });
 
-            const titles = {dashboard: "Tổng Quan", codes: "Kho Giftcode", withdraw: "Duyệt Đơn", users: "Người Dùng"};
+            const titles = {dashboard: "Tổng Quan", codes: "Kho Giftcode", withdraw: "Duyệt Đơn", users: "Người Dùng", history: "Lịch Sử"};
             document.getElementById("page-title").innerText = titles[tab].toUpperCase();
             
             if(tab === 'withdraw') loadWithdraws();
             if(tab === 'codes' && document.getElementById("list-codes").children.length === 0) loadCodes();
             if(tab === 'dashboard') loadStats();
+            if(tab === 'history') loadHistory();
+        }
+
+        window.switchHistoryTab = (subTab) => {
+            if(subTab === 'tx') {
+                document.getElementById('hist-list-tx').classList.remove('hidden');
+                document.getElementById('hist-list-wd').classList.add('hidden');
+                document.getElementById('htab-tx').classList.add('active', 'text-white');
+                document.getElementById('htab-tx').classList.remove('text-slate-500');
+                document.getElementById('htab-wd').classList.remove('active', 'text-white');
+                document.getElementById('htab-wd').classList.add('text-slate-500');
+            } else {
+                document.getElementById('hist-list-tx').classList.add('hidden');
+                document.getElementById('hist-list-wd').classList.remove('hidden');
+                document.getElementById('htab-wd').classList.add('active', 'text-white');
+                document.getElementById('htab-wd').classList.remove('text-slate-500');
+                document.getElementById('htab-tx').classList.remove('active', 'text-white');
+                document.getElementById('htab-tx').classList.add('text-slate-500');
+            }
         }
 
         // --- LOGIC ---
         async function loadStats() {
             try {
-                const [pending, users, codes, withdraws] = await Promise.all([
+                // Fetch data for Dashboard Stats
+                const [pending, users, codes, withdraws, adminDeps] = await Promise.all([
                     db.from("withdraw_request").select("*", { count: 'exact', head: true }).eq("status", "pending"),
                     db.from("users").select("balance"),
                     db.from("codes_deposit").select("value, used_count"),
-                    db.from("withdraw_request").select("amount").eq("status", "approved")
+                    db.from("withdraw_request").select("amount").eq("status", "approved"),
+                    // Fetch Admin Deposits (admin_add and admin_create) to add to 'Total In'
+                    db.from("deposit_history").select("amount").in("source", ["admin_add", "admin_create"])
                 ]);
 
+                // Calculate Totals
                 const totalBalance = users.data ? users.data.reduce((sum, u) => sum + (u.balance || 0), 0) : 0;
-                const totalIn = codes.data ? codes.data.reduce((sum, c) => sum + (c.value * c.used_count), 0) : 0;
+                const totalCodeIn = codes.data ? codes.data.reduce((sum, c) => sum + (c.value * c.used_count), 0) : 0;
+                const totalAdminIn = adminDeps.data ? adminDeps.data.reduce((sum, d) => sum + (d.amount || 0), 0) : 0;
+                
+                // Final In = Codes + Admin Manual Deposits
+                const totalIn = totalCodeIn + totalAdminIn;
+                
                 const totalOut = withdraws.data ? withdraws.data.reduce((sum, w) => sum + (w.amount || 0), 0) : 0;
 
                 document.getElementById("stat-pending").innerText = pending.count || 0;
@@ -320,6 +374,90 @@
             } catch(e) { console.error(e); }
         }
 
+        // --- HISTORY LOGIC ---
+        window.loadHistory = async () => {
+            const loader = document.getElementById("hist-loader");
+            const listTx = document.getElementById("hist-list-tx");
+            const listWd = document.getElementById("hist-list-wd");
+            const searchTerm = document.getElementById("hist-search-input").value.trim().toUpperCase();
+            
+            loader.classList.remove("hidden");
+
+            try {
+                // Build Queries
+                let queryTx = db.from("deposit_history").select("*").order("created_at", { ascending: false }).limit(50);
+                let queryWd = db.from("withdraw_request").select("*").neq("status", "pending").order("time_done", { ascending: false }).limit(50);
+
+                // Apply Search Filter if exists
+                if (searchTerm) {
+                    queryTx = queryTx.eq("uid", searchTerm);
+                    queryWd = queryWd.eq("uid", searchTerm);
+                }
+
+                // Execute Queries
+                const [resTx, resWd] = await Promise.all([queryTx, queryWd]);
+                const deposits = resTx.data;
+                const withdraws = resWd.data;
+
+                // Render TX
+                if(!deposits || !deposits.length) {
+                    listTx.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy giao dịch ${searchTerm ? 'cho ' + searchTerm : ''}</div>`;
+                } else {
+                    listTx.innerHTML = deposits.map(d => {
+                        const isAdd = ['admin_add', 'code_deposit', 'withdraw_refund', 'admin_create'].includes(d.source);
+                        const color = isAdd ? 'text-emerald-400' : 'text-rose-400';
+                        const sign = isAdd ? '+' : '-';
+                        const time = new Date(d.created_at).toLocaleString('vi-VN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+                        
+                        return `
+                        <div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 flex justify-between items-center animate-slide-up">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${d.uid}</span>
+                                    <span class="text-[10px] text-slate-500">${time}</span>
+                                </div>
+                                <div class="text-xs text-white font-medium">${d.note || d.source}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="${color} font-bold font-mono text-sm">${sign}${d.amount.toLocaleString()}</div>
+                                <div class="text-[9px] text-slate-600 uppercase tracking-wider">${d.source.replace('_', ' ')}</div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                // Render Withdraws
+                if(!withdraws || !withdraws.length) {
+                    listWd.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy đơn rút ${searchTerm ? 'của ' + searchTerm : ''}</div>`;
+                } else {
+                    listWd.innerHTML = withdraws.map(w => {
+                        const isApproved = w.status === 'approved';
+                        const statusColor = isApproved ? 'text-emerald-500' : 'text-rose-500';
+                        const statusText = isApproved ? 'THÀNH CÔNG' : 'ĐÃ HỦY';
+                        const time = new Date(w.time_done || w.time_request).toLocaleString('vi-VN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+                        return `
+                        <div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 animate-slide-up">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-white font-bold font-mono">${w.amount.toLocaleString()}</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">${time}</div>
+                                </div>
+                                <div class="text-[10px] font-bold ${statusColor} bg-slate-800/50 px-2 py-1 rounded border border-white/5">${statusText}</div>
+                            </div>
+                            <div class="flex justify-between items-center border-t border-white/5 pt-2 mt-1">
+                                <span class="text-[10px] text-slate-400 font-mono">${w.uid}</span>
+                                <span class="text-[10px] text-slate-300 font-bold text-right truncate w-32">${w.bank_name} - ${w.bank_account}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+            } catch(e) { console.error(e); }
+            loader.classList.add("hidden");
+        }
+
+        // --- CODES LOGIC ---
         window.loadCodes = async () => {
             const list = document.getElementById("list-codes");
             list.innerHTML = '<div class="flex justify-center py-4"><div class="spinner"></div></div>';
@@ -402,6 +540,7 @@
             }
         };
 
+        // --- WITHDRAW LOGIC ---
         window.loadWithdraws = async () => {
             const list = document.getElementById("list-withdraws");
             const { data } = await db.from("withdraw_request").select("*").eq("status", "pending").order("time_request", {ascending: false});
@@ -445,6 +584,7 @@
             card.style.opacity = '0.5';
             
             const { error } = await db.from("withdraw_request").update({ status: "approved", time_done: new Date().toISOString() }).eq("id", id);
+            
             if (!error) {
                 card.remove();
                 showToast("Đã duyệt");
@@ -467,8 +607,17 @@
                 const { data: w } = await db.from("withdraw_request").select("uid, amount").eq("id", id).single();
                 const { data: u } = await db.from("users").select("balance").eq("id", w.uid).single();
                 
+                // Refund Balance
                 await db.from("users").update({ balance: (u.balance || 0) + (w.amount || 0) }).eq("id", w.uid);
+                // Update Status
                 await db.from("withdraw_request").update({ status: "rejected", time_done: new Date().toISOString() }).eq("id", id);
+                // Log to History
+                await db.from("deposit_history").insert({ 
+                    uid: w.uid, 
+                    amount: w.amount, 
+                    source: "withdraw_refund", 
+                    note: "Hoàn tiền rút" 
+                });
                 
                 card.remove();
                 showToast("Đã hoàn tiền");
@@ -476,6 +625,7 @@
             } catch (e) {
                 card.style.opacity = '1';
                 showToast("Lỗi", "error");
+                console.error(e);
             }
             isProcessing = false;
         };
