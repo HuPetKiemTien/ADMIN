@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CoinAdmin Pro - Central Command</title>
+    <title>CoinAdmin Pro - Bank Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,11 +22,16 @@
                     },
                     animation: {
                         'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'fade-in': 'fadeIn 0.2s ease-out',
                     },
                     keyframes: {
                         slideUp: {
-                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
                             '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
                         }
                     }
                 }
@@ -68,7 +73,7 @@
                 </button>
             </div>
         </div>
-        <p class="absolute bottom-6 text-slate-700 text-[10px] font-mono">SECURE SYSTEM V7.4 (REF 4%)</p>
+        <p class="absolute bottom-6 text-slate-700 text-[10px] font-mono">SECURE SYSTEM V7.6 (BANK INFO)</p>
     </div>
 
     <!-- MAIN APP -->
@@ -155,37 +160,24 @@
             </div>
 
             <!-- VIEW: USERS -->
-            <div id="view-users" class="hidden flex-1 overflow-y-auto no-scrollbar p-5 pb-24 animate-slide-up">
-                <div class="bg-[#151A23] p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full pointer-events-none"></div>
-                    <div class="flex flex-col items-center mb-6">
-                        <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-indigo-500/20">
-                            <i class="fa-solid fa-wallet"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-lg">Biến động số dư</h3>
+            <div id="view-users" class="hidden h-full flex flex-col animate-slide-up">
+                <!-- User Search -->
+                <div class="shrink-0 p-4 border-b border-slate-800 bg-[#0B0E14] z-20">
+                    <div class="relative">
+                        <input id="user-search" onkeyup="if(event.key === 'Enter') fetchUsers()" type="text" class="w-full bg-[#151A23] border border-slate-700 text-white text-sm rounded-xl pl-10 pr-4 py-3 focus:border-blue-500 outline-none transition-colors uppercase font-mono placeholder-slate-600" placeholder="Tìm ID người chơi...">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                        <button onclick="fetchUsers()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg active:scale-95">TÌM</button>
                     </div>
-                    <div class="space-y-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">ID Người dùng</label>
-                            <input id="adjust-uid" type="text" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-indigo-500 outline-none font-mono text-sm placeholder-slate-700 transition-all uppercase" placeholder="NHAP-USER-ID">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] text-slate-500 font-bold uppercase ml-1">Số tiền</label>
-                            <input id="adjust-amount" type="tel" oninput="formatInput(this)" class="w-full bg-[#0B0E14] border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-indigo-500 outline-none font-bold font-mono text-lg placeholder-slate-700 transition-all" placeholder="0">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 mt-6">
-                        <button onclick="adjustBalance('subtract')" class="py-3 rounded-xl bg-slate-800 text-rose-400 font-bold text-xs hover:bg-slate-700 transition-colors border border-slate-700">TRỪ TIỀN</button>
-                        <button onclick="adjustBalance('add')" class="py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 shadow-lg shadow-indigo-900/30 transition-colors">CỘNG TIỀN</button>
-                    </div>
+                </div>
+                <!-- User List -->
+                <div id="list-users" class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 pb-24">
+                    <div class="text-center text-slate-600 text-xs py-10">Nhập ID hoặc để trống và bấm TÌM để xem tất cả</div>
                 </div>
             </div>
 
             <!-- VIEW: HISTORY -->
             <div id="view-history" class="hidden flex-1 flex flex-col h-full animate-slide-up">
-                <!-- Search & Tabs -->
                 <div class="shrink-0 bg-[#0B0E14] z-20 border-b border-slate-800">
-                    <!-- Search Bar -->
                     <div class="px-4 pt-4 pb-2">
                         <div class="relative">
                             <input id="hist-search-input" onkeyup="if(event.key === 'Enter') loadHistory()" type="text" class="w-full bg-[#151A23] border border-slate-700 text-white text-xs rounded-xl pl-10 pr-4 py-3 focus:border-blue-500 outline-none transition-colors uppercase font-mono" placeholder="Tìm theo ID User...">
@@ -193,22 +185,14 @@
                             <button onclick="loadHistory()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg">TÌM</button>
                         </div>
                     </div>
-                    <!-- Tab Switchers -->
                     <div class="flex items-center gap-6 px-4 pt-2">
                         <button onclick="switchHistoryTab('tx')" id="htab-tx" class="tab-btn active pb-3 text-sm font-bold text-white transition-colors">Biến động</button>
                         <button onclick="switchHistoryTab('wd')" id="htab-wd" class="tab-btn pb-3 text-sm font-bold text-slate-500 hover:text-white transition-colors">Lịch sử Rút</button>
                     </div>
                 </div>
-                
-                <!-- Content -->
                 <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 pb-24 relative">
-                    <div id="hist-list-tx" class="space-y-3">
-                        <!-- Transactions -->
-                    </div>
-                    <div id="hist-list-wd" class="hidden space-y-3">
-                        <!-- Withdrawals -->
-                    </div>
-                    <!-- Loader Overlay for History -->
+                    <div id="hist-list-tx" class="space-y-3"></div>
+                    <div id="hist-list-wd" class="hidden space-y-3"></div>
                     <div id="hist-loader" class="hidden absolute inset-0 flex items-center justify-center bg-[#0B0E14] z-30">
                         <div class="spinner"></div>
                     </div>
@@ -236,6 +220,96 @@
                 <i class="fa-solid fa-clock-rotate-left text-lg"></i>
             </button>
         </nav>
+
+        <!-- USER DETAIL MODAL -->
+        <div id="user-modal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4">
+            <div class="bg-[#151A23] w-full max-w-md h-[85vh] sm:h-auto sm:max-h-[90vh] rounded-t-3xl sm:rounded-3xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+                
+                <!-- Modal Header -->
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0B0E14]">
+                    <div>
+                        <h3 class="text-white font-bold text-lg">Chi tiết người chơi</h3>
+                        <p class="text-[10px] text-slate-500 font-mono" id="modal-uid">UID: ---</p>
+                    </div>
+                    <button onclick="closeUserModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-slate-700 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-blue-600/10 border border-blue-600/20 p-3 rounded-xl">
+                            <p class="text-[10px] text-blue-300 mb-1">Số dư chính</p>
+                            <p class="text-lg font-bold text-white font-mono truncate" id="modal-balance">0</p>
+                        </div>
+                        <div class="bg-purple-600/10 border border-purple-600/20 p-3 rounded-xl">
+                            <p class="text-[10px] text-purple-300 mb-1">Hoa hồng</p>
+                            <p class="text-lg font-bold text-white font-mono truncate" id="modal-commission">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Referrer Info -->
+                    <div class="bg-[#0B0E14] p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <span class="text-xs text-slate-500">Người giới thiệu (Ref)</span>
+                        <span class="text-xs text-white font-mono font-bold bg-slate-800 px-2 py-1 rounded" id="modal-ref">KHÔNG CÓ</span>
+                    </div>
+
+                    <!-- BANK INFO SECTION (NEW) -->
+                    <div class="bg-[#0B0E14] p-3 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <p class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><i class="fa-solid fa-building-columns"></i> Thông tin ngân hàng</p>
+                            <span class="text-[9px] text-slate-600 bg-slate-800/50 px-1.5 rounded">Gần nhất</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <!-- Bank Name -->
+                            <div class="col-span-1 bg-[#151A23] p-2 rounded border border-slate-700/50">
+                                <p class="text-[9px] text-slate-500 mb-0.5">Ngân hàng</p>
+                                <p class="text-white font-bold text-xs truncate" id="modal-bank-name">---</p>
+                            </div>
+                            <!-- Owner Name -->
+                            <div class="col-span-1 bg-[#151A23] p-2 rounded border border-slate-700/50">
+                                <p class="text-[9px] text-slate-500 mb-0.5">Chủ tài khoản</p>
+                                <p class="text-white font-bold text-xs uppercase truncate" id="modal-bank-owner">---</p>
+                            </div>
+                            <!-- Account Number -->
+                            <div class="col-span-2 bg-[#151A23] p-2 rounded border border-slate-700/50 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] text-slate-500 mb-0.5">Số tài khoản</p>
+                                    <p class="text-white font-mono font-bold text-sm tracking-wide text-blue-400" id="modal-bank-num">---</p>
+                                </div>
+                                <button onclick="copyBankInfo()" class="w-7 h-7 bg-slate-800 rounded flex items-center justify-center text-slate-400 hover:text-white active:scale-90 transition-transform">
+                                    <i class="fa-regular fa-copy text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adjust Balance Form -->
+                    <div class="bg-[#0B0E14] p-4 rounded-xl border border-slate-800 space-y-3">
+                        <p class="text-xs font-bold text-slate-300 uppercase tracking-wide">Điều chỉnh số dư</p>
+                        <div class="flex gap-2">
+                            <input id="modal-amount" type="tel" oninput="formatInput(this)" class="flex-1 bg-[#151A23] border border-slate-700 text-white text-sm rounded-lg px-3 py-2 focus:border-blue-500 outline-none font-mono" placeholder="Nhập số tiền...">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="modalAdjust('subtract')" class="py-2 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 text-xs font-bold hover:bg-rose-500/20">TRỪ TIỀN</button>
+                            <button onclick="modalAdjust('add')" class="py-2 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-bold hover:bg-emerald-500/20">CỘNG TIỀN</button>
+                        </div>
+                    </div>
+
+                    <!-- Mini History -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 mb-2 uppercase">Lịch sử gần đây</p>
+                        <div id="modal-history" class="space-y-2"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- TOAST -->
@@ -253,6 +327,7 @@
         const db = createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let isProcessing = false;
+        let currentModalUser = null; 
 
         // --- UI UTILS ---
         function showToast(msg, type = 'success') {
@@ -293,6 +368,7 @@
             btn.querySelector('i').classList.add('fa-spin');
             await Promise.all([loadStats(), loadCodes(), loadWithdraws()]); 
             if (!document.getElementById("view-history").classList.contains("hidden")) loadHistory();
+            if (!document.getElementById("view-users").classList.contains("hidden")) fetchUsers();
             setTimeout(() => btn.querySelector('i').classList.remove('fa-spin'), 500);
         };
 
@@ -302,7 +378,7 @@
                 const nav = document.getElementById(`nav-${t}`);
                 if (t === tab) {
                     el.classList.remove('hidden');
-                    if (t === 'codes' || t === 'history') el.classList.add('flex');
+                    if (t === 'codes' || t === 'history' || t === 'users') el.classList.add('flex');
                     nav.classList.add('text-blue-400');
                     nav.classList.remove('text-slate-500');
                 } else {
@@ -320,6 +396,7 @@
             if(tab === 'codes' && document.getElementById("list-codes").children.length === 0) loadCodes();
             if(tab === 'dashboard') loadStats();
             if(tab === 'history') loadHistory();
+            if(tab === 'users') fetchUsers();
         }
 
         window.switchHistoryTab = (subTab) => {
@@ -340,27 +417,20 @@
             }
         }
 
-        // --- LOGIC ---
+        // --- DASHBOARD ---
         async function loadStats() {
             try {
-                // Fetch data for Dashboard Stats
                 const [pending, users, codes, withdraws, adminDeps] = await Promise.all([
                     db.from("withdraw_request").select("*", { count: 'exact', head: true }).eq("status", "pending"),
                     db.from("users").select("balance"),
                     db.from("codes_deposit").select("value, used_count"),
                     db.from("withdraw_request").select("amount").eq("status", "approved"),
-                    // Fetch Admin Deposits (admin_add and admin_create) to add to 'Total In'
                     db.from("deposit_history").select("amount").in("source", ["admin_add", "admin_create"])
                 ]);
-
-                // Calculate Totals
                 const totalBalance = users.data ? users.data.reduce((sum, u) => sum + (u.balance || 0), 0) : 0;
                 const totalCodeIn = codes.data ? codes.data.reduce((sum, c) => sum + (c.value * c.used_count), 0) : 0;
                 const totalAdminIn = adminDeps.data ? adminDeps.data.reduce((sum, d) => sum + (d.amount || 0), 0) : 0;
-                
-                // Final In = Codes + Admin Manual Deposits
                 const totalIn = totalCodeIn + totalAdminIn;
-                
                 const totalOut = withdraws.data ? withdraws.data.reduce((sum, w) => sum + (w.amount || 0), 0) : 0;
 
                 document.getElementById("stat-pending").innerText = pending.count || 0;
@@ -368,111 +438,148 @@
                 document.getElementById("money-in").innerText = totalIn.toLocaleString();
                 document.getElementById("money-out").innerText = totalOut.toLocaleString();
                 document.getElementById("money-holding").innerText = totalBalance.toLocaleString();
-
                 const badge = document.getElementById("badge-withdraw");
                 if ((pending.count || 0) > 0) badge.classList.remove("hidden"); else badge.classList.add("hidden");
             } catch(e) { console.error(e); }
         }
 
-        // --- HISTORY LOGIC ---
-        window.loadHistory = async () => {
-            const loader = document.getElementById("hist-loader");
-            const listTx = document.getElementById("hist-list-tx");
-            const listWd = document.getElementById("hist-list-wd");
-            const searchTerm = document.getElementById("hist-search-input").value.trim().toUpperCase();
-            
-            loader.classList.remove("hidden");
+        // --- USER MANAGEMENT ---
+        window.fetchUsers = async () => {
+            const list = document.getElementById("list-users");
+            const search = document.getElementById("user-search").value.trim().toUpperCase();
+            list.innerHTML = '<div class="flex justify-center py-4"><div class="spinner"></div></div>';
+            let query = db.from("users").select("*");
+            if (search) query = query.ilike('id', `%${search}%`);
+            const { data, error } = await query.order('balance', {ascending: false}).limit(50);
+            if (error || !data || data.length === 0) { list.innerHTML = '<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy user nào</div>'; return; }
+            list.innerHTML = data.map(u => `
+                <div onclick="openUserModal('${u.id}')" class="bg-[#151A23] border border-slate-800 rounded-xl p-3 flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer hover:border-blue-500/30 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-blue-900/20">
+                            ${u.id.substring(0, 2)}
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white font-mono group-hover:text-blue-400 transition-colors">${u.id}</div>
+                            <div class="text-[10px] text-slate-500">Ref: ${u.ref_by || '---'}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-emerald-400 font-mono">${(u.balance || 0).toLocaleString()}</div>
+                        <div class="text-[10px] text-purple-400 font-mono">HH: ${(u.commission_balance || 0).toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        };
 
-            try {
-                // Build Queries
-                let queryTx = db.from("deposit_history").select("*").order("created_at", { ascending: false }).limit(50);
-                let queryWd = db.from("withdraw_request").select("*").neq("status", "pending").order("time_done", { ascending: false }).limit(50);
+        window.openUserModal = async (uid) => {
+            const modal = document.getElementById('user-modal');
+            const historyDiv = document.getElementById('modal-history');
+            modal.classList.remove('hidden');
+            document.getElementById('modal-uid').innerText = uid;
+            document.getElementById('modal-balance').innerText = '...';
+            document.getElementById('modal-commission').innerText = '...';
+            document.getElementById('modal-amount').value = '';
+            document.getElementById('modal-bank-name').innerText = 'Loading...';
+            document.getElementById('modal-bank-owner').innerText = 'Loading...';
+            document.getElementById('modal-bank-num').innerText = 'Loading...';
+            historyDiv.innerHTML = '<div class="text-center py-4"><div class="spinner"></div></div>';
 
-                // Apply Search Filter if exists
-                if (searchTerm) {
-                    queryTx = queryTx.eq("uid", searchTerm);
-                    queryWd = queryWd.eq("uid", searchTerm);
-                }
+            const { data: user } = await db.from("users").select("*").eq("id", uid).single();
+            if(user) {
+                currentModalUser = user;
+                document.getElementById('modal-balance').innerText = (user.balance || 0).toLocaleString();
+                document.getElementById('modal-commission').innerText = (user.commission_balance || 0).toLocaleString();
+                document.getElementById('modal-ref').innerText = user.ref_by || "KHÔNG CÓ";
 
-                // Execute Queries
-                const [resTx, resWd] = await Promise.all([queryTx, queryWd]);
-                const deposits = resTx.data;
-                const withdraws = resWd.data;
-
-                // Render TX
-                if(!deposits || !deposits.length) {
-                    listTx.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy giao dịch ${searchTerm ? 'cho ' + searchTerm : ''}</div>`;
+                // FETCH BANK INFO (Latest withdrawal)
+                const { data: lastWd } = await db.from("withdraw_request").select("bank_name, bank_account, holder_name").eq("uid", uid).order("time_request", {ascending: false}).limit(1).maybeSingle();
+                
+                if (user.bank_name) {
+                     // Prefer info directly on user table if exists
+                     document.getElementById('modal-bank-name').innerText = user.bank_name || '---';
+                     document.getElementById('modal-bank-owner').innerText = user.bank_owner || '---';
+                     document.getElementById('modal-bank-num').innerText = user.bank_account || '---';
+                } else if (lastWd) {
+                     // Fallback to latest withdrawal info
+                     document.getElementById('modal-bank-name').innerText = lastWd.bank_name || '---';
+                     document.getElementById('modal-bank-owner').innerText = lastWd.holder_name || '---';
+                     document.getElementById('modal-bank-num').innerText = lastWd.bank_account || '---';
                 } else {
-                    listTx.innerHTML = deposits.map(d => {
-                        // NGUỒN TIỀN NẠP (DƯƠNG)
-                        const isAdd = ['admin_add', 'code_deposit', 'code', 'withdraw_refund', 'admin_create', 'referral_bonus', 'commission_withdraw'].includes(d.source);
-                        const color = isAdd ? 'text-emerald-400' : 'text-rose-400';
-                        const sign = isAdd ? '+' : '-';
-                        const time = new Date(d.created_at).toLocaleString('vi-VN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
-                        
-                        return `
-                        <div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 flex justify-between items-center animate-slide-up">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${d.uid}</span>
-                                    <span class="text-[10px] text-slate-500">${time}</span>
-                                </div>
-                                <div class="text-xs text-white font-medium">${d.note || d.source}</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="${color} font-bold font-mono text-sm">${sign}${d.amount.toLocaleString()}</div>
-                                <div class="text-[9px] text-slate-600 uppercase tracking-wider">${d.source.replace('_', ' ')}</div>
-                            </div>
-                        </div>`;
-                    }).join('');
+                     document.getElementById('modal-bank-name').innerText = 'Chưa cập nhật';
+                     document.getElementById('modal-bank-owner').innerText = '---';
+                     document.getElementById('modal-bank-num').innerText = '---';
                 }
 
-                // Render Withdraws
-                if(!withdraws || !withdraws.length) {
-                    listWd.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy đơn rút ${searchTerm ? 'của ' + searchTerm : ''}</div>`;
+                const { data: history } = await db.from("deposit_history").select("*").eq("uid", uid).order("created_at", {ascending: false}).limit(5);
+                if(!history || history.length === 0) {
+                     historyDiv.innerHTML = '<div class="text-center text-slate-600 text-[10px] py-2">Chưa có lịch sử</div>';
                 } else {
-                    listWd.innerHTML = withdraws.map(w => {
-                        const isApproved = w.status === 'approved';
-                        const statusColor = isApproved ? 'text-emerald-500' : 'text-rose-500';
-                        const statusText = isApproved ? 'THÀNH CÔNG' : 'ĐÃ HỦY';
-                        const time = new Date(w.time_done || w.time_request).toLocaleString('vi-VN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
-
-                        return `
-                        <div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 animate-slide-up">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <div class="text-white font-bold font-mono">${w.amount.toLocaleString()}</div>
-                                    <div class="text-[10px] text-slate-500 font-mono">${time}</div>
-                                </div>
-                                <div class="text-[10px] font-bold ${statusColor} bg-slate-800/50 px-2 py-1 rounded border border-white/5">${statusText}</div>
-                            </div>
-                            <div class="flex justify-between items-center border-t border-white/5 pt-2 mt-1">
-                                <span class="text-[10px] text-slate-400 font-mono">${w.uid}</span>
-                                <span class="text-[10px] text-slate-300 font-bold text-right truncate w-32">${w.bank_name} - ${w.bank_account}</span>
-                            </div>
-                        </div>`;
-                    }).join('');
+                    historyDiv.innerHTML = history.map(h => `
+                        <div class="flex justify-between items-center text-xs bg-black/20 p-2 rounded border border-white/5">
+                            <span class="text-slate-400">${h.note || h.source}</span>
+                            <span class="${h.amount > 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono">${h.amount > 0 ? '+' : ''}${h.amount.toLocaleString()}</span>
+                        </div>
+                    `).join('');
                 }
+            } else {
+                closeUserModal();
+                showToast("Lỗi tải dữ liệu", "error");
+            }
+        };
 
-            } catch(e) { console.error(e); }
-            loader.classList.add("hidden");
+        window.closeUserModal = () => {
+            document.getElementById('user-modal').classList.add('hidden');
+            currentModalUser = null;
+        };
+
+        window.modalAdjust = async (type) => {
+            if(!currentModalUser) return;
+            const uid = currentModalUser.id;
+            const raw = document.getElementById("modal-amount").value.replace(/,/g, '');
+            const amount = parseInt(raw);
+            if (!amount) return showToast("Nhập số tiền!", "error");
+            if (!confirm(`Xác nhận ${type === 'add' ? 'CỘNG' : 'TRỪ'} ${amount.toLocaleString()} cho ${uid}?`)) return;
+
+            const oldBal = currentModalUser.balance || 0;
+            let newBal = oldBal;
+            if (type === 'add') newBal += amount;
+            else {
+                if(newBal < amount) return showToast("Không đủ số dư", "error");
+                newBal -= amount;
+            }
+
+            const { error } = await db.from("users").update({ balance: newBal }).eq("id", uid);
+            if(!error) {
+                await db.from("deposit_history").insert({ 
+                    uid, amount, source: type === 'add' ? "admin_add" : "admin_sub", 
+                    note: type === 'add' ? "Admin nạp (Modal)" : "Admin trừ (Modal)" 
+                });
+                if (type === 'add' && currentModalUser.ref_by) {
+                     const comm = amount * 0.04;
+                     const { data: refUser } = await db.from("users").select("commission_balance").eq("id", currentModalUser.ref_by).single();
+                     if(refUser) await db.from("users").update({ commission_balance: (refUser.commission_balance || 0) + comm }).eq("id", currentModalUser.ref_by);
+                }
+                showToast("Thành công");
+                openUserModal(uid); fetchUsers(); loadStats();
+            } else { showToast("Lỗi hệ thống", "error"); }
+        };
+
+        window.copyBankInfo = () => {
+            const num = document.getElementById('modal-bank-num').innerText;
+            if(num === '---') return;
+            navigator.clipboard.writeText(num);
+            showToast("Đã copy STK");
         }
 
-        // --- CODES LOGIC ---
+        // --- CODES & WITHDRAW ---
         window.loadCodes = async () => {
             const list = document.getElementById("list-codes");
             list.innerHTML = '<div class="flex justify-center py-4"><div class="spinner"></div></div>';
-            
             const { data, error } = await db.from("codes_deposit").select("*").order("id", {ascending: false});
-            
-            if (error || !data || !data.length) { 
-                list.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Danh sách trống</div>`; 
-                return; 
-            }
+            if (error || !data || !data.length) { list.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Danh sách trống</div>`; return; }
             list.innerHTML = "";
             data.forEach(c => renderCodeItem(c, list));
         };
-
         function renderCodeItem(c, container, isNew = false) {
             const isExpired = c.expired || c.used_count >= c.max_use;
             const html = `
@@ -494,64 +601,32 @@
                 </div>`;
             if(isNew) container.insertAdjacentHTML('afterbegin', html); else container.insertAdjacentHTML('beforeend', html);
         }
-
         window.createDepositCode = async () => {
             const btn = document.querySelector('button[onclick="createDepositCode()"]');
             const originalIcon = btn.innerHTML;
             btn.innerHTML = '<div class="spinner" style="width:12px;height:12px;"></div>';
             btn.disabled = true;
-
             const val = parseInt(document.getElementById("code-amount").value.replace(/,/g, ''));
             const max = parseInt(document.getElementById("code-max").value);
-
-            if (!val) {
-                showToast("Nhập giá trị!", "error");
-                btn.innerHTML = originalIcon;
-                btn.disabled = false;
-                return;
-            }
-
+            if (!val) { showToast("Nhập giá trị!", "error"); btn.innerHTML = originalIcon; btn.disabled = false; return; }
             const code = Math.random().toString(36).substr(2, 6).toUpperCase();
             const { error } = await db.from("codes_deposit").insert({ code, value: val, max_use: max, used_count: 0, expired: false });
-
-            if (error) { showToast("Lỗi!", "error"); } 
-            else {
-                showToast("Đã tạo code");
-                document.getElementById("code-amount").value = "";
-                const list = document.getElementById("list-codes");
-                if(list.innerText.includes("trống")) list.innerHTML = "";
-                renderCodeItem({ code, value: val, max_use: max, used_count: 0, expired: false }, list, true);
-                loadStats();
-            }
-            btn.innerHTML = originalIcon;
-            btn.disabled = false;
+            if (error) { showToast("Lỗi!", "error"); } else { showToast("Đã tạo code"); document.getElementById("code-amount").value = ""; const list = document.getElementById("list-codes"); if(list.innerText.includes("trống")) list.innerHTML = ""; renderCodeItem({ code, value: val, max_use: max, used_count: 0, expired: false }, list, true); loadStats(); }
+            btn.innerHTML = originalIcon; btn.disabled = false;
         };
-
         window.deleteCode = async (code, btn) => {
             if(!confirm("Xóa mã này?")) return;
             const card = btn.closest('div');
             card.style.opacity = '0';
             const { error } = await db.from("codes_deposit").delete().eq("code", code);
-            if(!error) { 
-                setTimeout(() => card.remove(), 300); 
-                loadStats();
-            } else {
-                card.style.opacity = '1';
-                showToast("Lỗi xóa", "error");
-            }
+            if(!error) { setTimeout(() => card.remove(), 300); loadStats(); } else { card.style.opacity = '1'; showToast("Lỗi xóa", "error"); }
         };
 
-        // --- WITHDRAW LOGIC ---
         window.loadWithdraws = async () => {
             const list = document.getElementById("list-withdraws");
             const { data } = await db.from("withdraw_request").select("*").eq("status", "pending").order("time_request", {ascending: false});
             document.getElementById("withdraw-count").innerText = (data?.length || 0);
-            
-            if (!data || !data.length) { 
-                list.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không có yêu cầu nào</div>`; 
-                return; 
-            }
-
+            if (!data || !data.length) { list.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không có yêu cầu nào</div>`; return; }
             list.innerHTML = "";
             data.forEach(w => {
                 list.innerHTML += `
@@ -576,112 +651,29 @@
                     </div>`;
             });
         };
-
-        window.handleApprove = async (id) => {
-            if (isProcessing) return;
-            if (!confirm("Duyệt đơn này?")) return;
-            isProcessing = true;
-            const card = document.getElementById(`wd-${id}`);
-            card.style.opacity = '0.5';
-            
-            const { error } = await db.from("withdraw_request").update({ status: "approved", time_done: new Date().toISOString() }).eq("id", id);
-            
-            if (!error) {
-                card.remove();
-                showToast("Đã duyệt");
-                loadStats();
-            } else {
-                card.style.opacity = '1';
-                showToast("Lỗi", "error");
-            }
-            isProcessing = false;
-        };
-
-        window.handleReject = async (id) => {
-            if (isProcessing) return;
-            if (!confirm("Hoàn tiền và hủy đơn?")) return;
-            isProcessing = true;
-            const card = document.getElementById(`wd-${id}`);
-            card.style.opacity = '0.5';
-
+        window.handleApprove = async (id) => { if (isProcessing) return; if (!confirm("Duyệt đơn này?")) return; isProcessing = true; const card = document.getElementById(`wd-${id}`); card.style.opacity = '0.5'; const { error } = await db.from("withdraw_request").update({ status: "approved", time_done: new Date().toISOString() }).eq("id", id); if (!error) { card.remove(); showToast("Đã duyệt"); loadStats(); } else { card.style.opacity = '1'; showToast("Lỗi", "error"); } isProcessing = false; };
+        window.handleReject = async (id) => { if (isProcessing) return; if (!confirm("Hoàn tiền và hủy đơn?")) return; isProcessing = true; const card = document.getElementById(`wd-${id}`); card.style.opacity = '0.5'; try { const { data: w } = await db.from("withdraw_request").select("uid, amount").eq("id", id).single(); const { data: u } = await db.from("users").select("balance").eq("id", w.uid).single(); await db.from("users").update({ balance: (u.balance || 0) + (w.amount || 0) }).eq("id", w.uid); await db.from("withdraw_request").update({ status: "rejected", time_done: new Date().toISOString() }).eq("id", id); await db.from("deposit_history").insert({ uid: w.uid, amount: w.amount, source: "withdraw_refund", note: "Hoàn tiền rút" }); card.remove(); showToast("Đã hoàn tiền"); loadStats(); } catch (e) { card.style.opacity = '1'; showToast("Lỗi", "error"); console.error(e); } isProcessing = false; };
+        
+        // --- HISTORY ---
+        window.loadHistory = async () => {
+            const loader = document.getElementById("hist-loader");
+            const listTx = document.getElementById("hist-list-tx");
+            const listWd = document.getElementById("hist-list-wd");
+            const searchTerm = document.getElementById("hist-search-input").value.trim().toUpperCase();
+            loader.classList.remove("hidden");
             try {
-                const { data: w } = await db.from("withdraw_request").select("uid, amount").eq("id", id).single();
-                const { data: u } = await db.from("users").select("balance").eq("id", w.uid).single();
-                
-                // Refund Balance
-                await db.from("users").update({ balance: (u.balance || 0) + (w.amount || 0) }).eq("id", w.uid);
-                // Update Status
-                await db.from("withdraw_request").update({ status: "rejected", time_done: new Date().toISOString() }).eq("id", id);
-                // Log to History
-                await db.from("deposit_history").insert({ 
-                    uid: w.uid, 
-                    amount: w.amount, 
-                    source: "withdraw_refund", 
-                    note: "Hoàn tiền rút" 
-                });
-                
-                card.remove();
-                showToast("Đã hoàn tiền");
-                loadStats();
-            } catch (e) {
-                card.style.opacity = '1';
-                showToast("Lỗi", "error");
-                console.error(e);
-            }
-            isProcessing = false;
-        };
-
-        window.adjustBalance = async (type) => {
-            const uid = document.getElementById("adjust-uid").value.trim().toUpperCase();
-            const raw = document.getElementById("adjust-amount").value.replace(/,/g, '');
-            const amount = parseInt(raw);
-            if (!uid || !amount) return showToast("Kiểm tra lại dữ liệu", "error");
-
-            if(!confirm(`Xác nhận ${type === 'add' ? 'NẠP' : 'TRỪ'} ${amount.toLocaleString()} cho ${uid}?`)) return;
-
-            const { data: user } = await db.from("users").select("balance, ref_by").eq("id", uid).maybeSingle();
-            
-            if (!user && type === 'subtract') return showToast("User không tồn tại", "error");
-            
-            let newBalance = user ? user.balance : 0;
-            if (type === 'add') newBalance += amount;
-            else {
-                if(newBalance < amount) return showToast("Không đủ số dư", "error");
-                newBalance -= amount;
-            }
-
-            if (!user && type === 'add') {
-                await db.from("users").insert({ id: uid, balance: newBalance });
-                await db.from("deposit_history").insert({ uid, amount, source: "admin_create", note: "Admin tạo mới" });
-            } else {
-                await db.from("users").update({ balance: newBalance }).eq("id", uid);
-                await db.from("deposit_history").insert({ 
-                    uid, amount, 
-                    source: type === 'add' ? "admin_add" : "admin_sub", 
-                    note: type === 'add' ? "Admin nạp" : "Admin trừ" 
-                });
-            }
-
-            // --- LOGIC CỘNG HOA HỒNG (4%) ---
-            if (type === 'add' && user && user.ref_by) {
-                const referrerId = user.ref_by;
-                const commission = amount * 0.04; // 4%
-
-                const { data: referrer } = await db.from("users").select("commission_balance").eq("id", referrerId).single();
-                
-                if (referrer) {
-                    await db.from("users").update({ 
-                        commission_balance: (referrer.commission_balance || 0) + commission 
-                    }).eq("id", referrerId);
-                }
-            }
-            // ------------------------------------
-            
-            showToast("Thành công");
-            document.getElementById("adjust-amount").value = "";
-            loadStats();
-        };
+                let queryTx = db.from("deposit_history").select("*").order("created_at", { ascending: false }).limit(50);
+                let queryWd = db.from("withdraw_request").select("*").neq("status", "pending").order("time_done", { ascending: false }).limit(50);
+                if (searchTerm) { queryTx = queryTx.eq("uid", searchTerm); queryWd = queryWd.eq("uid", searchTerm); }
+                const [resTx, resWd] = await Promise.all([queryTx, queryWd]);
+                const deposits = resTx.data; const withdraws = resWd.data;
+                if(!deposits || !deposits.length) { listTx.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy giao dịch ${searchTerm ? 'cho ' + searchTerm : ''}</div>`; } else { listTx.innerHTML = deposits.map(d => { const isAdd = ['admin_add', 'code_deposit', 'code', 'withdraw_refund', 'admin_create', 'referral_bonus', 'commission_withdraw'].includes(d.source); const color = isAdd ? 'text-emerald-400' : 'text-rose-400'; const sign = isAdd ? '+' : '-'; const time = new Date(d.created_at).toLocaleString('vi-VN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }); return `<div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 flex justify-between items-center animate-slide-up"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${d.uid}</span><span class="text-[10px] text-slate-500">${time}</span></div><div class="text-xs text-white font-medium">${d.note || d.source}</div></div><div class="text-right"><div class="${color} font-bold font-mono text-sm">${sign}${d.amount.toLocaleString()}</div><div class="text-[9px] text-slate-600 uppercase tracking-wider">${d.source.replace('_', ' ')}</div></div></div>`; }).join(''); }
+                if(!withdraws || !withdraws.length) { listWd.innerHTML = `<div class="text-center text-slate-600 text-xs py-10">Không tìm thấy đơn rút ${searchTerm ? 'của ' + searchTerm : ''}</div>`; } else { listWd.innerHTML = withdraws.map(w => { const isApproved = w.status === 'approved'; const statusColor = isApproved ? 'text-emerald-500' : 'text-rose-500'; const statusText = isApproved ? 'THÀNH CÔNG' : 'ĐÃ HỦY'; const time = new Date(w.time_done || w.time_request).toLocaleString('vi-VN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }); return `<div class="bg-[#151A23] border border-slate-800 rounded-xl p-3 animate-slide-up"><div class="flex justify-between items-start mb-2"><div><div class="text-white font-bold font-mono">${w.amount.toLocaleString()}</div><div class="text-[10px] text-slate-500 font-mono">${time}</div></div><div class="text-[10px] font-bold ${statusColor} bg-slate-800/50 px-2 py-1 rounded border border-white/5">${statusText}</div></div><div class="flex justify-between items-center border-t border-white/5 pt-2 mt-1"><span class="text-[10px] text-slate-400 font-mono">${w.uid}</span><span class="text-[10px] text-slate-300 font-bold text-right truncate w-32">${w.bank_name} - ${w.bank_account}</span></div></div>`; }).join(''); }
+            } catch(e) { console.error(e); }
+            loader.classList.add("hidden");
+        }
     </script>
 </body>
 </html>
+
 
